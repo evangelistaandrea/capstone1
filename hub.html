@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Classroom Hub | PHINMA UPang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --school-green: #1b4332; --school-gold: #f1c40f; --paper-white: #ffffff; --border-ink: #e2e8f0; --bg-gray: #f2f4f7; }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        /* Prevent the whole page from scrolling */
+        body { 
+            background: var(--bg-gray); 
+            color: var(--school-green); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; /* This locks the screen */
+            padding: 20px 30px;
+        }
+
+        /* Header remains fixed at the top because of the flex column */
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--paper-white); padding: 20px 30px; border-radius: 15px;
+            border-bottom: 5px solid var(--school-gold);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            flex-shrink: 0; /* Prevents header from shrinking */
+            margin-bottom: 20px;
+        }
+
+        /* Container fills the remaining space */
+        .container { 
+            flex-grow: 1; 
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Keeps the container locked */
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        /* The section box now has the scrollbar inside it */
+        .section-box { 
+            background: var(--paper-white); 
+            border-radius: 20px; 
+            padding: 40px; 
+            border: 1px solid var(--border-ink); 
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Fill available space */
+            overflow: hidden; 
+        }
+
+        /* This area specifically will scroll if there are many buildings/rooms */
+        .scroll-area {
+            flex-grow: 1;
+            overflow-y: auto; 
+            padding-right: 10px;
+            margin-top: 20px;
+        }
+
+        /* Custom Scrollbar for a cleaner look */
+        .scroll-area::-webkit-scrollbar { width: 8px; }
+        .scroll-area::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        .scroll-area::-webkit-scrollbar-thumb:hover { background: var(--school-green); }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+            padding-bottom: 20px;
+        }
+        
+        .selection-card {
+            background: #fff; border: 2px solid #f1f5f9; border-radius: 15px; padding: 30px; 
+            text-align: center; cursor: pointer; transition: all 0.3s ease;
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
+        }
+        .selection-card:hover { 
+            border-color: var(--school-gold); transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(27, 67, 50, 0.1);
+        }
+
+        .disabled-card {
+            background: #f8fafc; border: 2px solid #e2e8f0; cursor: not-allowed;
+            pointer-events: none; opacity: 0.7;
+        }
+        .disabled-card h3, .disabled-card i { color: #94a3b8 !important; }
+
+        .selection-card i { color: var(--school-green); font-size: 2.5rem; }
+        .selection-card h3 { font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 1.1rem; }
+        
+        .btn-back {
+            background: none; border: none; color: #64748b; font-weight: 700; 
+            cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-back:hover { color: var(--school-green); }
+
+        .status-badge {
+            font-size: 0.7rem; background: #dcfce7; color: #166534; 
+            padding: 4px 12px; border-radius: 20px; font-weight: 800;
+        }
+        .status-badge.off { background: #f1f5f9; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <img src="logo.png" height="60">
+            <div>
+                <h1 style="font-size: 1.8rem; font-weight: 900;">SMART CLASSROOM MONITORING SYSTEM</h1>
+                <p id="faculty-display" style="font-size: 0.8rem; font-weight: 600; color: #64748b;"></p>
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <button onclick="window.location.href='index.html'" style="border:none; background:none; color:var(--school-green); font-weight:bold; cursor:pointer;">LOGOUT</button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div id="building-view" class="section-box">
+            <h2 style="font-size: 1.5rem; font-weight: 900; border-left: 5px solid var(--school-gold); padding-left: 15px;">SELECT BUILDING</h2>
+            
+            <div class="scroll-area">
+                <div class="grid">
+                    <div class="selection-card" onclick="openBuilding('North Hall')"><i class="fas fa-building"></i><h3>North Hall</h3></div>
+                    <div class="selection-card" onclick="openBuilding('PTC')"><i class="fas fa-tools"></i><h3>PTC</h3></div>
+                    <div class="selection-card" onclick="openBuilding('MBA')"><i class="fas fa-briefcase"></i><h3>MBA Building</h3></div>
+                    <div class="selection-card" onclick="openBuilding('CMA')"><i class="fas fa-hospital-user"></i><h3>CMA</h3></div>
+                    <div class="selection-card" onclick="openBuilding('BE')"><i class="fas fa-laptop-code"></i><h3>BE Building</h3></div>
+                    <div class="selection-card" onclick="openBuilding('CCJE')"><i class="fas fa-shield-halved"></i><h3>CCJE</h3></div>
+                    <div class="selection-card" onclick="openBuilding('Riverside')"><i class="fas fa-water"></i><h3>Riverside</h3></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="room-view" class="section-box" style="display: none;">
+            <div>
+                <button class="btn-back" onclick="location.reload()">
+                    <i class="fas fa-arrow-left"></i> BACK TO BUILDINGS
+                </button>
+                <h2 id="current-bldg" style="font-size: 1.5rem; font-weight: 900; border-left: 5px solid var(--school-gold); padding-left: 15px;">---</h2>
+            </div>
+            
+            <div class="scroll-area">
+                <div class="grid">
+                    <div class="selection-card" onclick="selectRoom('Room 101')"><h3>Room 101</h3><span class="status-badge">ACTIVE</span></div>
+                    <div class="selection-card disabled-card"><h3>Room 102</h3><span class="status-badge off">NO SENSOR</span></div>
+                    <div class="selection-card" onclick="selectRoom('Room 205')"><h3>Room 205</h3><span class="status-badge">ACTIVE</span></div>
+                    <div class="selection-card disabled-card"><h3>Room 206</h3><span class="status-badge off">OFFLINE</span></div>
+                    <div class="selection-card" onclick="selectRoom('Room 302')"><h3>Room 302</h3><span class="status-badge">ACTIVE</span></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('faculty-display').innerText = "Faculty: " + (localStorage.getItem('faculty') || "Not Logged In");
+
+        function openBuilding(bldg) {
+            document.getElementById('building-view').style.display = 'none';
+            document.getElementById('room-view').style.display = 'flex'; // Changed to flex for fixed layout
+            document.getElementById('current-bldg').innerText = bldg.toUpperCase();
+            localStorage.setItem('building', bldg);
+        }
+
+        function selectRoom(room) {
+            localStorage.setItem('room', room);
+            window.location.href = 'monitor.html';
+        }
+    </script>
+</body>
+</html>
