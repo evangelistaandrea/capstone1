@@ -2,159 +2,258 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom Hub | PHINMA UPang</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --school-green: #1b4332; --school-gold: #f1c40f; --paper-white: #ffffff; --border-ink: #e2e8f0; --bg-gray: #f2f4f7; }
+        :root { 
+            --school-green: #1b4332; 
+            --paper-white: #ffffff; 
+            --desk-gray: #f2f4f7; 
+            --border-ink: #e2e8f0; 
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --error-red: #94a3b8;
+        }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
-        /* Prevent the whole page from scrolling */
         body { 
-            background: var(--bg-gray); 
-            color: var(--school-green); 
+            background: var(--desk-gray); 
+            color: var(--text-main); 
             height: 100vh; 
             display: flex; 
             flex-direction: column; 
-            overflow: hidden; /* This locks the screen */
-            padding: 20px 30px;
+            padding: 25px;
+            overflow: hidden;
         }
 
-        /* Header remains fixed at the top because of the flex column */
         .header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--paper-white); padding: 20px 30px; border-radius: 15px;
-            border-bottom: 5px solid var(--school-gold);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            flex-shrink: 0; /* Prevents header from shrinking */
-            margin-bottom: 20px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            background: var(--paper-white); 
+            padding: 20px 35px; 
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 25px auto;
         }
 
-        /* Container fills the remaining space */
+        .header-left { display: flex; align-items: center; gap: 18px; }
+        .header-left img { height: 55px; }
+        
+        .header-info h1 { 
+            font-size: 1.3rem; 
+            font-weight: 900; 
+            color: var(--school-green); 
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        #class-text { 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            color: var(--text-sub);
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
         .container { 
             flex-grow: 1; 
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Keeps the container locked */
             max-width: 1200px;
             width: 100%;
             margin: 0 auto;
-        }
-        
-        /* The section box now has the scrollbar inside it */
-        .section-box { 
-            background: var(--paper-white); 
-            border-radius: 20px; 
-            padding: 40px; 
-            border: 1px solid var(--border-ink); 
             display: flex;
             flex-direction: column;
-            height: 100%; /* Fill available space */
-            overflow: hidden; 
+            overflow: hidden;
+        }
+        
+        .section-box { 
+            background: var(--paper-white); 
+            border-radius: 25px; 
+            padding: 40px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            height: 100%; 
+            overflow: hidden;
         }
 
-        /* This area specifically will scroll if there are many buildings/rooms */
+        .view-title {
+            font-size: 1.6rem; 
+            font-weight: 900; 
+            color: var(--school-green);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--desk-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .scroll-area {
             flex-grow: 1;
             overflow-y: auto; 
-            padding-right: 10px;
-            margin-top: 20px;
+            padding: 10px 5px;
         }
-
-        /* Custom Scrollbar for a cleaner look */
-        .scroll-area::-webkit-scrollbar { width: 8px; }
-        .scroll-area::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-        .scroll-area::-webkit-scrollbar-thumb:hover { background: var(--school-green); }
 
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
             gap: 20px; 
-            padding-bottom: 20px;
         }
         
         .selection-card {
-            background: #fff; border: 2px solid #f1f5f9; border-radius: 15px; padding: 30px; 
-            text-align: center; cursor: pointer; transition: all 0.3s ease;
-            display: flex; flex-direction: column; align-items: center; gap: 15px;
-        }
-        .selection-card:hover { 
-            border-color: var(--school-gold); transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(27, 67, 50, 0.1);
+            background: var(--paper-white); 
+            border: 2px solid var(--border-ink); 
+            border-radius: 18px; 
+            padding: 40px 20px;
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            gap: 15px;
         }
 
-        .disabled-card {
-            background: #f8fafc; border: 2px solid #e2e8f0; cursor: not-allowed;
-            pointer-events: none; opacity: 0.7;
+        .selection-card:not(.unavailable):hover { 
+            border-color: var(--school-green);
+            transform: translateY(-5px);
+            background-color: #f0fdf4;
+            box-shadow: 0 12px 20px rgba(27, 67, 50, 0.08);
         }
-        .disabled-card h3, .disabled-card i { color: #94a3b8 !important; }
 
-        .selection-card i { color: var(--school-green); font-size: 2.5rem; }
-        .selection-card h3 { font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 1.1rem; }
-        
+        .selection-card.unavailable {
+            cursor: not-allowed;
+            background-color: #f8fafc;
+            opacity: 0.7;
+        }
+
+        .selection-card.unavailable i, 
+        .selection-card.unavailable h3 {
+            color: var(--text-sub);
+        }
+
+        .selection-card i { 
+            color: var(--school-green); 
+            font-size: 2.8rem; 
+            margin-bottom: 5px;
+        }
+
+        .selection-card h3 { 
+            font-weight: 800; 
+            font-size: 1.1rem; 
+            color: var(--text-main);
+            text-transform: uppercase; 
+        }
+
+        .exit-btn {
+            background: #fff;
+            color: #dc2626;
+            border: 2px solid #fee2e2;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .exit-btn:hover { 
+            background: #dc2626; 
+            color: white; 
+            border-color: #dc2626;
+        }
+
         .btn-back {
-            background: none; border: none; color: #64748b; font-weight: 700; 
-            cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+            background: var(--desk-gray); 
+            border: none; 
+            color: var(--text-sub);
+            padding: 10px 20px; 
+            border-radius: 10px; 
+            font-weight: 800; 
+            font-size: 0.8rem;
+            cursor: pointer; 
+            margin-bottom: 20px; 
+            width: fit-content;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-back:hover { color: var(--school-green); }
 
         .status-badge {
-            font-size: 0.7rem; background: #dcfce7; color: #166534; 
-            padding: 4px 12px; border-radius: 20px; font-weight: 800;
+            font-size: 0.75rem; 
+            background: #dcfce7; 
+            color: #166534; 
+            padding: 6px 14px; 
+            border-radius: 8px; 
+            font-weight: 800;
+            margin-top: 5px;
         }
-        .status-badge.off { background: #f1f5f9; color: #64748b; }
+
+        .status-badge.red {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .scroll-area::-webkit-scrollbar { width: 8px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--border-ink); border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <img src="logo.png" height="60">
-            <div>
-                <h1 style="font-size: 1.8rem; font-weight: 900;">SMART CLASSROOM MONITORING SYSTEM</h1>
-                <p id="faculty-display" style="font-size: 0.8rem; font-weight: 600; color: #64748b;"></p>
+        <div class="header-left">
+            <img src="logo.png" alt="PHINMA">
+            <div class="header-info">
+                <h1>Classroom Monitoring</h1>
+                <div id="class-text">---</div>
             </div>
         </div>
-        <div style="text-align: right;">
-            <button onclick="window.location.href='index.html'" style="border:none; background:none; color:var(--school-green); font-weight:bold; cursor:pointer;">LOGOUT</button>
-        </div>
+        <button class="exit-btn" onclick="window.location.href='index.html'">
+            <i class="fas fa-power-off"></i> EXIT 
+        </button>
     </header>
 
     <div class="container">
         
         <div id="building-view" class="section-box">
-            <h2 style="font-size: 1.5rem; font-weight: 900; border-left: 5px solid var(--school-gold); padding-left: 15px;">SELECT BUILDING</h2>
-            
+            <div class="view-title">Select Building</div>
             <div class="scroll-area">
                 <div class="grid">
                     <div class="selection-card" onclick="openBuilding('North Hall')"><i class="fas fa-building"></i><h3>North Hall</h3></div>
                     <div class="selection-card" onclick="openBuilding('PTC')"><i class="fas fa-tools"></i><h3>PTC</h3></div>
-                    <div class="selection-card" onclick="openBuilding('MBA')"><i class="fas fa-briefcase"></i><h3>MBA Building</h3></div>
+                    <div class="selection-card" onclick="openBuilding('MBA')"><i class="fas fa-briefcase"></i><h3>MBA</h3></div>
                     <div class="selection-card" onclick="openBuilding('CMA')"><i class="fas fa-hospital-user"></i><h3>CMA</h3></div>
-                    <div class="selection-card" onclick="openBuilding('BE')"><i class="fas fa-laptop-code"></i><h3>BE Building</h3></div>
-                    <div class="selection-card" onclick="openBuilding('CCJE')"><i class="fas fa-shield-halved"></i><h3>CCJE</h3></div>
+                    <div class="selection-card" onclick="openBuilding('BE Building')"><i class="fas fa-laptop-code"></i><h3>BE Building</h3></div>
                     <div class="selection-card" onclick="openBuilding('Riverside')"><i class="fas fa-water"></i><h3>Riverside</h3></div>
                 </div>
             </div>
         </div>
 
         <div id="room-view" class="section-box" style="display: none;">
-            <div>
-                <button class="btn-back" onclick="location.reload()">
-                    <i class="fas fa-arrow-left"></i> BACK TO BUILDINGS
-                </button>
-                <h2 id="current-bldg" style="font-size: 1.5rem; font-weight: 900; border-left: 5px solid var(--school-gold); padding-left: 15px;">---</h2>
-            </div>
-            
+            <button class="btn-back" onclick="location.reload()">
+                <i class="fas fa-arrow-left"></i> Back to Buildings
+            </button>
+            <div class="view-title" id="current-bldg">---</div>
             <div class="scroll-area">
                 <div class="grid">
-                    <div class="selection-card" onclick="selectRoom('Room 101')"><h3>Room 101</h3><span class="status-badge">ACTIVE</span></div>
-                    <div class="selection-card disabled-card"><h3>Room 102</h3><span class="status-badge off">NO SENSOR</span></div>
-                    <div class="selection-card" onclick="selectRoom('Room 205')"><h3>Room 205</h3><span class="status-badge">ACTIVE</span></div>
-                    <div class="selection-card disabled-card"><h3>Room 206</h3><span class="status-badge off">OFFLINE</span></div>
-                    <div class="selection-card" onclick="selectRoom('Room 302')"><h3>Room 302</h3><span class="status-badge">ACTIVE</span></div>
+                    <div class="selection-card" onclick="selectRoom('Room 101')"><h3>Room 101</h3><span class="status-badge">CHECK STATUS</span></div>
+                    
+                    <div class="selection-card unavailable">
+                        <h3>Room 205</h3>
+                        <span class="status-badge red">UNAVAILABLE</span>
+                    </div>
+
+                    <div class="selection-card" onclick="selectRoom('Room 302')"><h3>Room 302</h3><span class="status-badge">CHECK STATUS</span></div>
                 </div>
             </div>
         </div>
@@ -162,12 +261,13 @@
     </div>
 
     <script>
-        document.getElementById('faculty-display').innerText = "Faculty: " + (localStorage.getItem('faculty') || "Not Logged In");
+        const savedClass = localStorage.getItem('course') || "No Active Session";
+        document.getElementById('class-text').innerText = savedClass;
 
         function openBuilding(bldg) {
             document.getElementById('building-view').style.display = 'none';
-            document.getElementById('room-view').style.display = 'flex'; // Changed to flex for fixed layout
-            document.getElementById('current-bldg').innerText = bldg.toUpperCase();
+            document.getElementById('room-view').style.display = 'flex';
+            document.getElementById('current-bldg').innerText = bldg;
             localStorage.setItem('building', bldg);
         }
 
