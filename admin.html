@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | PHINMA UPang</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: #f1f5f9; color: #1e293b; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+
+   
+        aside {
+            width: 260px; background: #1b4332; color: white;
+            display: flex; flex-direction: column; padding: 25px; border-right: 1px solid #e2e8f0;
+        }
+        .sidebar-logo { margin-bottom: 30px; }
+        .nav-list { list-style: none; padding: 0; flex-grow: 1; }
+        .nav-item { 
+            padding: 12px 15px; border-radius: 12px; margin-bottom: 8px; 
+            cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.2s; opacity: 0.7;
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); opacity: 1; }
+
+
+        .content-area { flex-grow: 1; display: flex; flex-direction: column; padding: 20px; gap: 15px; overflow-y: auto; }
+        
+        header {
+            background: white; padding: 12px 25px; border-radius: 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04); border: 1px solid #e2e8f0;
+        }
+
+  
+        .data-card { background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; }
+        .label-tiny { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; color: #64748b; display: block; margin-bottom: 10px; }
+        
+
+        .occupancy-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .stat-box { padding: 20px; border-radius: 16px; text-align: center; }
+        
+        .room-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); 
+            gap: 10px; 
+            margin-top: 15px; 
+        }
+        .room-unit {
+            padding: 12px 5px; border-radius: 10px; text-align: center;
+            font-size: 0.8rem; font-weight: 700; border: 1px solid transparent;
+        }
+        .room-free { background: #f0fdf4; border-color: #bbf7d0; color: #16a34a; }
+        .room-busy { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+
+   
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .exit-btn { background: #fee2e2; color: #dc2626; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="sidebar-logo">
+            <h1 style="font-size: 1.2rem; margin: 0;">PHINMA UPang</h1>
+            <span style="font-size: 0.6rem; opacity: 0.6;">ADMIN DASHBOARD</span>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item active">DASHBOARD</li>
+            <li class="nav-item">ROOM MANAGEMENT</li>
+            <li class="nav-item">SENSOR REPORTS</li>
+            <li class="nav-item">USER LOGS</li>
+        </ul>
+        <div style="font-size: 0.7rem; opacity: 0.4;">Version 2.0.26</div>
+    </aside>
+
+    <div class="content-area">
+        <header>
+            <div style="font-weight: 800; color: #1b4332;">Campus Overview</div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="text-align: right;">
+                    <p id="clock" style="font-weight: 800; color: #1b4332; margin:0;">00:00:00</p>
+                    <p id="date" style="font-size: 0.7rem; color: #64748b; margin:0;"></p>
+                </div>
+                <button class="exit-btn" onclick="location.href='index.html'">EXIT</button>
+            </div>
+        </header>
+
+        <div class="occupancy-summary">
+            <div class="stat-box" style="background: #1b4332; color: white;">
+                <span class="label-tiny" style="color: rgba(255,255,255,0.6)">Total Rooms</span>
+                <div style="font-size: 2rem; font-weight: 900;">24</div>
+            </div>
+            <div class="stat-box" style="background: white; border: 1px solid #bbf7d0;">
+                <span class="label-tiny" style="color: #16a34a;">Available Now</span>
+                <div style="font-size: 2rem; font-weight: 900; color: #16a34a;">14</div>
+            </div>
+            <div class="stat-box" style="background: white; border: 1px solid #fecaca;">
+                <span class="label-tiny" style="color: #dc2626;">Occupied</span>
+                <div style="font-size: 2rem; font-weight: 900; color: #dc2626;">10</div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="data-card">
+                <span class="label-tiny">Occupancy Ratio</span>
+                <div style="height: 200px; display: flex; justify-content: center;">
+                    <canvas id="occPie"></canvas>
+                </div>
+            </div>
+            <div class="data-card">
+                <span class="label-tiny">Sensor Anomaly: PTC 306 (3PM Spike)</span>
+                <canvas id="tempLine" height="180"></canvas>
+            </div>
+        </div>
+
+        <div class="data-card">
+            <span class="label-tiny">PTC Building Live Room Map</span>
+            <div class="room-grid">
+                <div class="room-unit room-free">101<br><span style="font-size: 0.5rem">FREE</span></div>
+                <div class="room-unit room-free">102<br><span style="font-size: 0.5rem">FREE</span></div>
+                <div class="room-unit room-busy">201<br><span style="font-size: 0.5rem">BUSY</span></div>
+                <div class="room-unit room-busy">202<br><span style="font-size: 0.5rem">BUSY</span></div>
+                <div class="room-unit room-free">203<br><span style="font-size: 0.5rem">FREE</span></div>
+                <div class="room-unit room-free">204<br><span style="font-size: 0.5rem">FREE</span></div>
+                <div class="room-unit room-busy">301<br><span style="font-size: 0.5rem">BUSY</span></div>
+                <div class="room-unit room-busy">302<br><span style="font-size: 0.5rem">BUSY</span></div>
+                <div class="room-unit room-free">303<br><span style="font-size: 0.5rem">FREE</span></div>
+                <div class="room-unit room-free">304<br><span style="font-size: 0.5rem">FREE</span></div>
+                <div class="room-unit room-free">305<br><span style="font-size: 0.5rem">FREE</span></div>
+                <div class="room-unit room-busy" style="background:#dc2626; color:white;">306<br><span style="font-size: 0.5rem">HOT</span></div>
+                <div class="room-unit room-free">401<br><span style="font-size: 0.5rem">FREE</span></div>
+                <div class="room-unit room-busy">402<br><span style="font-size: 0.5rem">BUSY</span></div>
+                <div class="room-unit room-free">403<br><span style="font-size: 0.5rem">FREE</span></div>
+                <div class="room-unit room-free">404<br><span style="font-size: 0.5rem">FREE</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour12: false});
+            document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+  
+        
+        const ctxPie = document.getElementById('occPie').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Available', 'Occupied'],
+                datasets: [{
+                    data: [14, 10],
+                    backgroundColor: ['#16a34a', '#dc2626'],
+                    borderWidth: 0
+                }]
+            },
+            options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+        });
+
+
+        const ctxLine = document.getElementById('tempLine').getContext('2d');
+        new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: ['12pm', '1pm', '2pm', '3pm', '4pm', '5pm'],
+                datasets: [{
+                    label: 'Temp °C',
+                    data: [24, 25, 27, 50, 32, 26],
+                    borderColor: '#dc2626',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(220, 38, 38, 0.1)'
+                }]
+            },
+            options: { plugins: { legend: { display: false } } }
+        });
+    </script>
+</body>
+</html>

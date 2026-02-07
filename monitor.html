@@ -2,248 +2,201 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Monitoring | PHINMA UPang</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHINMA UPang | Smart Classroom</title>
     <style>
-        :root { 
-            --school-green: #1b4332; 
-            --paper-white: #ffffff; 
-            --border-ink: #e2e8f0; 
-            --text-sub: #64748b;
-        }
+        * { box-sizing: border-box; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-
-        body { 
-            background: #f2f4f7; 
-            padding: 20px; 
-            color: var(--school-green); 
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            margin: 0;
+            padding: 20px;
             height: 100vh;
+            overflow: hidden;
             display: flex;
-            flex-direction: column;
-            overflow: hidden; 
+            justify-content: center;
         }
 
-        .header {
-            display: flex; 
-            justify-content: space-between; 
+        .dashboard-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        header {
+            background: white;
+            padding: 12px 25px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            background: var(--paper-white); 
-            padding: 15px 30px; 
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            flex-shrink: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
         }
 
-        .main-layout { 
-            display: grid; 
-            grid-template-columns: 320px 1fr; 
-            gap: 20px; 
-            flex-grow: 1;
-            min-height: 0; 
-        }
-
-        .panel { 
-            background: var(--paper-white); 
-            border-radius: 20px; 
-            padding: 25px; 
-            border: 1px solid var(--border-ink); 
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            height: 100%;
+        .brand-section { display: flex; align-items: center; gap: 12px; }
+        
+        .logo-container {
+            width: 45px; height: 45px; 
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
         }
         
-        .right-content {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            height: 100%;
+        .logo-container img {
+            width: 100%; height: 100%; object-fit: contain;
         }
 
-        .occupancy-hero {
-            background: var(--school-green); 
-            color: white; 
-            padding: 40px; 
-            border-radius: 20px;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-shrink: 0;
+        .brand-text h1 { margin: 0; font-size: 1.2rem; color: #1b4332; letter-spacing: -0.5px; }
+        .brand-text span { font-size: 0.65rem; text-transform: uppercase; color: #64748b; }
+
+        .search-area { flex-grow: 1; max-width: 350px; margin: 0 30px; }
+        .search-area input {
+            width: 100%; padding: 10px 20px; border-radius: 12px;
+            border: 1px solid #e2e8f0; background: #f8fafc; outline: none; font-size: 0.9rem;
         }
 
-        .sensor-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            grid-template-rows: repeat(2, 1fr);
-            gap: 20px; 
-            flex-grow: 1; 
-        }
+        .header-info { display: flex; align-items: center; gap: 20px; }
+        .time-group { text-align: right; padding-right: 20px; border-right: 1px solid #e2e8f0; }
+        #clock { font-size: 1.3rem; font-weight: 800; color: #1b4332; margin: 0; }
+        #date-day { font-size: 0.7rem; color: #64748b; margin: 0; }
 
-        .sensor-card { 
-            background: #fff; 
-            border: 2px solid var(--border-ink); 
-            border-radius: 18px; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .s-val { 
-            font-size: 3.5rem; 
-            font-weight: 900; 
-            color: var(--school-green); 
-            line-height: 1;
-        }
-
-        .s-label {
-            color: var(--text-sub);
+        .exit-btn {
+            background: #fee2e2; 
+            color: #dc2626; 
+            border: none;
+            padding: 12px 25px; 
+            border-radius: 12px; 
             font-weight: 800;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            margin-top: 10px;
-            letter-spacing: 1px;
-        }
-
-        .schedule-item { 
-            margin-bottom: 18px; 
-            padding-bottom: 12px; 
-            border-bottom: 1px dashed #cbd5e1; 
-        }
-
-        .label { 
-            font-size: 0.7rem; 
-            font-weight: 800; 
-            color: #94a3b8; 
-            text-transform: uppercase; 
-        }
-
-        .data { 
-            font-size: 1.05rem; 
-            font-weight: 800; 
-            color: var(--school-green); 
-            margin-top: 3px;
-        }
-
-        .exit-link {
-            margin-top: auto;
-            background: #be123c;
-            color: white;
-            padding: 18px;
-            border-radius: 12px;
-            font-weight: 900;
-            text-align: center;
+            font-size: 0.85rem; 
             cursor: pointer;
-            text-decoration: none;
-            display: block;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
         }
 
-        .exit-link:hover { 
-            background: #9f1239; 
+        .exit-btn:hover { 
+            background: #fecaca; 
+            color: #b91c1c;
+            transform: scale(1.02);
         }
 
-        #clock { font-weight: 900; font-size: 1.8rem; line-height: 1; }
-        #date-display { font-size: 0.8rem; font-weight: 700; color: var(--text-sub); margin-top: 2px; }
+        .room-title-strip {
+            display: flex; align-items: baseline; gap: 10px; padding: 5px 10px;
+        }
+        .room-title-strip h2 { margin: 0; font-size: 1.8rem; font-weight: 900; color: #1b4332; }
+        .room-title-strip span { color: #64748b; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
+
+        main {
+            flex-grow: 1; display: flex; flex-direction: column; gap: 20px;
+        }
+
+        .occupancy-section {
+            background: #1b4332; color: white; border-radius: 24px;
+            padding: 40px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; height: 50%; 
+            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.1);
+        }
+
+        .occ-label { 
+            font-size: 0.9rem; text-transform: uppercase; 
+            letter-spacing: 4px; opacity: 0.5; margin-bottom: 10px;
+        }
+
+        .occ-value { font-size: 8rem; font-weight: 900; line-height: 1; margin: 0; }
+
+        .occ-badge {
+            background: #f1c40f; color: #1b4332; padding: 8px 25px;
+            border-radius: 50px; font-weight: 800; font-size: 0.9rem; margin-top: 20px;
+        }
+
+        .sensor-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; height: 40%; 
+        }
+
+        .sensor-card {
+            background: white; padding: 25px; border-radius: 20px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            border: 1px solid #e2e8f0;
+        }
+
+        .sensor-title { font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .sensor-reading { font-size: 2.2rem; font-weight: 800; color: #1b4332; display: block; margin-top: 10px; }
+        .sensor-status-label { font-size: 0.75rem; font-weight: 600; color: #22c55e; }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <img src="logo.png" height="55">
-            <div>
-                <h1 id="display-room" style="font-size: 1.6rem; font-weight: 900;">ROOM ---</h1>
-                <p id="display-bldg" style="font-size: 0.8rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase;"></p>
-            </div>
-        </div>
-        <div style="text-align: right;">
-            <div id="clock">00:00:00</div>
-            <div id="date-display">LOADING...</div>
-        </div>
-    </header>
-
-    <div class="main-layout">
-        <div class="panel">
-            <h2 style="font-size: 0.85rem; margin-bottom: 25px; color: var(--text-sub); border-bottom: 3px solid var(--school-green); padding-bottom: 8px; font-weight: 900;">SESSION DETAILS</h2>
-            
-            <div class="schedule-item">
-                <div class="label">Course / Section</div>
-                <div class="data" id="out-course">---</div>
-            </div>
-            
-            <div class="schedule-item">
-                <div class="label">Assigned Faculty</div>
-                <div class="data" id="out-faculty">---</div>
-            </div>
-
-            <div class="schedule-item">
-                <div class="label">Schedule</div>
-                <div class="data" id="out-time">---</div>
-            </div>
-
-            <div style="background:#dcfce7; color:#166534; padding:12px; border-radius:10px; font-weight:800; text-align:center; font-size: 0.75rem; margin-bottom: 10px;">
-                <i class="fas fa-circle" style="font-size: 0.6rem; vertical-align: middle; margin-right: 5px;"></i> SYSTEM ONLINE
-            </div>
-
-            <a href="index.html" class="exit-link">
-                <i class="fas fa-power-off"></i> Exit Session
-            </a>
-        </div>
-
-        <div class="right-content">
-            <div class="occupancy-hero">
-                <div>
-                    <div style="font-size: 0.9rem; opacity: 0.8; font-weight: 800; letter-spacing: 1px;">REAL-TIME OCCUPANCY</div>
-                    <div style="font-size: 6rem; font-weight: 900; line-height: 1;">35 <small style="font-size: 2rem; opacity: 0.5;">/ 40</small></div>
+    <div class="dashboard-container">
+        <header>
+            <div class="brand-section">
+                <div class="logo-container">
+                    <img src="logo.png" alt="University Logo">
                 </div>
-                <i class="fas fa-users fa-5x" style="opacity: 0.15;"></i>
+                <div class="brand-text">
+                    <h1>PHINMA UPang</h1>
+                    <span>Smart Classroom System</span>
+                </div>
+            </div>
+
+            <div class="search-area">
+                <input type="text" placeholder="Search room...">
+            </div>
+
+            <div class="header-info">
+                <div class="time-group">
+                    <p id="clock">00:00:00</p>
+                    <p id="date-day">Date Loading...</p>
+                </div>
+                
+                <button class="exit-btn" onclick="location.href='index.html'">EXIT</button>
+            </div>
+        </header>
+
+        <div class="room-title-strip">
+            <span>Currently Monitoring:</span>
+            <h2>PTC 201</h2>
+        </div>
+
+        <main>
+            <div class="occupancy-section">
+                <span class="occ-label">Live Attendance</span>
+                <div class="occ-value">40 <span style="font-size: 3rem; opacity: 0.3;">/ 50</span></div>
+                <div class="occ-badge">STATUS: OPTIMAL</div>
             </div>
 
             <div class="sensor-grid">
                 <div class="sensor-card">
-                    <div class="s-val">24.5°C</div>
-                    <div class="s-label">Temperature</div>
+                    <span class="sensor-title">Temperature</span>
+                    <div><span class="sensor-reading">24.5°C</span><span class="sensor-status-label">Normal</span></div>
                 </div>
                 <div class="sensor-card">
-                    <div class="s-val">58%</div>
-                    <div class="s-label">Humidity</div>
+                    <span class="sensor-title">Humidity</span>
+                    <div><span class="sensor-reading">58%</span><span class="sensor-status-label">Ideal</span></div>
                 </div>
                 <div class="sensor-card">
-                    <div class="s-val">92 AQI</div>
-                    <div class="s-label">Air Quality</div>
+                    <span class="sensor-title">Air Quality</span>
+                    <div><span class="sensor-reading">92 AQI</span><span class="sensor-status-label" style="color: #eab308;">Moderate</span></div>
                 </div>
                 <div class="sensor-card">
-                    <div class="s-val">450 Lx</div>
-                    <div class="s-label">Light Level</div>
+                    <span class="sensor-title">Lighting</span>
+                    <div><span class="sensor-reading">450 Lx</span><span class="sensor-status-label">Sufficient</span></div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        document.getElementById('display-room').innerText = localStorage.getItem('room') || "ROOM";
-        document.getElementById('display-bldg').innerText = localStorage.getItem('building') || "BUILDING";
-        document.getElementById('out-faculty').innerText = localStorage.getItem('faculty') || "N/A";
-        document.getElementById('out-course').innerText = localStorage.getItem('course') || "N/A";
-        document.getElementById('out-time').innerText = localStorage.getItem('time') || "N/A";
-
-        function updateDateTime() {
+        function update() {
             const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString([], { hour12: false });
-            const options = { weekday: 'long', year: 'numeric', month: 'short', day: '2-digit' };
-            document.getElementById('date-display').innerText = now.toLocaleDateString('en-US', options).toUpperCase();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour12: false});
+            document.getElementById('date-day').innerText = now.toLocaleDateString(undefined, {
+                weekday: 'long', year: 'numeric', month: 'short', day: 'numeric'
+            });
         }
-
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
+        setInterval(update, 1000);
+        update();
     </script>
 </body>
 </html>

@@ -12,6 +12,7 @@
             --desk-gray: #f2f4f7; 
             --border-ink: #e2e8f0; 
             --hint-gray: #94a3b8; 
+            --accent-green: #2d6a4f;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -24,55 +25,39 @@
             min-height: 100vh; 
         }
         
-        #setup-card {
+        #login-card {
             background: var(--paper-white); 
             padding: 40px; 
             border-radius: 20px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             width: 100%; 
-            max-width: 480px; 
+            max-width: 420px; 
             text-align: center;
         }
 
         .logo-img { height: 80px; margin-bottom: 15px; }
-        .form-header h2 { font-weight: 800; font-size: 1.4rem; color: var(--school-green); }
+        .form-header h2 { font-weight: 800; font-size: 1.4rem; color: var(--school-green); line-height: 1.2; }
         .input-group { margin: 18px 0; text-align: left; }
         .input-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 8px; color: #64748b; text-transform: uppercase; }
-        .course-grid { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 10px; }
 
-        /* The input and selected text color */
-        .input-group select, .input-group input { 
+        .input-group input { 
             width: 100%; 
-            padding: 12px; 
+            padding: 12px 16px; 
             border-radius: 10px; 
             border: 2px solid var(--border-ink); 
             outline: none; 
             font-weight: 600; 
             color: var(--school-green); 
             background: white;
+            transition: all 0.2s;
         }
 
-        /* 1. Makes the "Start" and "End" (Placeholders) GRAY */
-        select:invalid, select option[value=""] {
-            color: var(--hint-gray) !important;
+        .input-group input:focus {
+            border-color: var(--school-green);
+            box-shadow: 0 0 0 4px rgba(27, 67, 50, 0.1);
         }
 
-        /* 2. Ensures normal choices stay the standard color */
-        select option {
-            color: var(--school-green);
-        }
-
-        /* 3. Makes options GRAY when they CANNOT be selected (disabled) */
-        select option:disabled { 
-            color: var(--hint-gray) !important; 
-            background-color: #f8fafc; 
-        }
-
-        .time-row { display: flex; align-items: center; gap: 10px; }
-        .time-row select { flex: 1; cursor: pointer; }
-        .separator { font-weight: 900; color: var(--school-green); font-size: 0.7rem; }
-
-        .btn-start { 
+        .btn-login { 
             width: 100%; 
             background: var(--school-green); 
             color: white; 
@@ -83,146 +68,91 @@
             cursor: pointer; 
             transition: 0.3s; 
             margin-top: 10px;
+            font-size: 1rem;
         }
         
-        .btn-start:hover { background: #2d6a4f; }
-        ::placeholder { color: var(--hint-gray); opacity: 1; }
+        .btn-login:hover { background: var(--accent-green); }
+
+        .btn-guest {
+            width: 100%;
+            background: transparent;
+            color: #475569;
+            border: 2px solid var(--border-ink);
+            padding: 13px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+
+        .btn-guest:hover {
+            background: #f8fafc;
+            color: var(--school-green);
+            border-color: var(--school-green);
+        }
+
+        .forgot-link {
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--hint-gray);
+            text-decoration: none;
+        }
+
+        .forgot-link:hover { color: var(--school-green); }
+
+        ::placeholder { color: var(--hint-gray); opacity: 0.7; }
     </style>
 </head>
 <body>
-    <div id="setup-card">
+    <div id="login-card">
         <img src="logo.png" alt="PHINMA Logo" class="logo-img">
+        
         <div class="form-header">
             <h2>PHINMA</h2>
             <h2>University of Pangasinan</h2>
-            <p style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">Smart Classroom Monitoring System</p>
+            <p style="font-size: 0.8rem; color: #64748b; margin-top: 8px;">Classroom Monitoring System</p>
         </div>
         
-        <div class="input-group">
-            <label>Assigned Faculty</label>
-            <input type="text" id="in-faculty" placeholder="e.g. Prof. Bustillo, N.">
-        </div>
-
-        <div class="input-group">
-            <label>Class Identification</label>
-            <div class="course-grid">
-                <select id="in-year" required>
-                    <option value="" disabled selected>Year</option>
-                    <option value="1st">1st</option>
-                    <option value="2nd">2nd</option>
-                    <option value="3rd">3rd</option>
-                    <option value="4th">4th</option>
-                </select>
-                <input type="text" id="in-course" placeholder="Course (e.g. BSIT)">
-                <input type="text" id="in-block" placeholder="Block">
+        <div style="margin-top: 30px;">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Enter your username">
             </div>
-        </div>
 
-        <div class="input-group">
-            <label>Time Schedule (1-3 Hours)</label>
-            <div class="time-row">
-                <select id="in-time-start" onchange="syncTimeOptions('start')" required>
-                    <option value="" disabled selected>Start</option>
-                    <option value="7:30 AM">7:30 AM</option>
-                    <option value="8:00 AM">8:00 AM</option>
-                    <option value="8:30 AM">8:30 AM</option>
-                    <option value="9:00 AM">9:00 AM</option>
-                    <option value="9:30 AM">9:30 AM</option>
-                    <option value="10:00 AM">10:00 AM</option>
-                    <option value="10:30 AM">10:30 AM</option>
-                    <option value="11:00 AM">11:00 AM</option>
-                    <option value="11:30 AM">11:30 AM</option>
-                    <option value="12:00 PM">12:00 PM</option>
-                    <option value="12:30 PM">12:30 PM</option>
-                    <option value="1:00 PM">1:00 PM</option>
-                    <option value="1:30 PM">1:30 PM</option>
-                    <option value="2:00 PM">2:00 PM</option>
-                    <option value="2:30 PM">2:30 PM</option>
-                    <option value="3:00 PM">3:00 PM</option>
-                    <option value="3:30 PM">3:30 PM</option>
-                    <option value="4:00 PM">4:00 PM</option>
-                </select>
-
-                <span class="separator">TO</span>
-
-                <select id="in-time-end" onchange="syncTimeOptions('end')" required>
-                    <option value="" disabled selected>End</option>
-                    <option value="8:30 AM">8:30 AM</option>
-                    <option value="9:00 AM">9:00 AM</option>
-                    <option value="9:30 AM">9:30 AM</option>
-                    <option value="10:00 AM">10:00 AM</option>
-                    <option value="10:30 AM">10:30 AM</option>
-                    <option value="11:00 AM">11:00 AM</option>
-                    <option value="11:30 AM">11:30 AM</option>
-                    <option value="12:00 PM">12:00 PM</option>
-                    <option value="12:30 PM">12:30 PM</option>
-                    <option value="1:00 PM">1:00 PM</option>
-                    <option value="1:30 PM">1:30 PM</option>
-                    <option value="2:00 PM">2:00 PM</option>
-                    <option value="2:30 PM">2:30 PM</option>
-                    <option value="3:00 PM">3:00 PM</option>
-                    <option value="3:30 PM">3:30 PM</option>
-                    <option value="4:00 PM">4:00 PM</option>
-                    <option value="4:30 PM">4:30 PM</option>
-                    <option value="5:00 PM">5:00 PM</option>
-                    <option value="5:30 PM">5:30 PM</option>
-                    <option value="6:00 PM">6:00 PM</option>
-                </select>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="login-pass" placeholder="••••••••">
             </div>
-        </div>
 
-        <button class="btn-start" onclick="saveAndContinue()">PROCEED</button>
+            <button class="btn-login" onclick="handleLogin()">LOGIN AS ADMIN</button>
+            
+            <button class="btn-guest" onclick="continueAsGuest()">CONTINUE AS GUEST</button>
+
+            <a href="#" class="forgot-link">Forgot Password?</a>
+        </div>
     </div>
 
     <script>
-        function timeToVal(tStr) {
-            if (!tStr) return null;
-            const [time, modifier] = tStr.split(' ');
-            let [hours, minutes] = time.split(':').map(Number);
-            if (modifier === 'PM' && hours !== 12) hours += 12;
-            if (modifier === 'AM' && hours === 12) hours = 0;
-            return hours + (minutes / 60);
-        }
+        function handleLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('login-pass').value;
 
-        function syncTimeOptions(triggeredBy) {
-            const startSelect = document.getElementById('in-time-start');
-            const endSelect = document.getElementById('in-time-end');
-            const startVal = timeToVal(startSelect.value);
-            const endVal = timeToVal(endSelect.value);
-
-            if (triggeredBy === 'start' && startVal !== null) {
-                Array.from(endSelect.options).forEach(opt => {
-                    if (opt.value === "") return;
-                    const val = timeToVal(opt.value);
-                    opt.disabled = (val < startVal + 1) || (val > startVal + 3);
-                });
-            }
-            if (triggeredBy === 'end' && endVal !== null) {
-                Array.from(startSelect.options).forEach(opt => {
-                    if (opt.value === "") return;
-                    const val = timeToVal(opt.value);
-                    opt.disabled = (val > endVal - 1) || (val < endVal - 3);
-                });
+            if (user && pass) {
+                localStorage.setItem('currentUser', user);
+                localStorage.setItem('authStatus', 'logged_in');
+                window.location.href = 'admin.html';
+            } else {
+                alert("Please enter a username and password to proceed.");
             }
         }
 
-        function saveAndContinue() {
-            const faculty = document.getElementById('in-faculty').value;
-            const year = document.getElementById('in-year').value;
-            const course = document.getElementById('in-course').value;
-            const block = document.getElementById('in-block').value;
-            const start = document.getElementById('in-time-start').value;
-            const end = document.getElementById('in-time-end').value;
-
-            if(!faculty || !year || !course || !block || !start || !end) { 
-                alert("Please fill in all details."); 
-                return; 
-            }
-
-            localStorage.setItem('faculty', faculty);
-            localStorage.setItem('course', `${year} Year ${course} - ${block}`);
-            localStorage.setItem('time', `${start} - ${end}`);
-            window.location.href = 'hub.html';
+        function continueAsGuest() {
+            localStorage.setItem('currentUser', 'Guest');
+            localStorage.setItem('authStatus', 'guest');
+            window.location.href = 'monitor.html';
         }
     </script>
 </body>
