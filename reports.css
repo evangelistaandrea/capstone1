@@ -1,0 +1,61 @@
+
+ .filter-bar {
+     background: white;
+     padding: 20px;
+     border-radius: 12px;
+     border: 1px solid #e2e8f0;
+     display: flex;
+     gap: 15px;
+     align-items: flex-end;
+     margin-bottom: 20px;
+     flex-wrap: wrap;
+ }
+ .filter-group {
+     display: flex;
+     flex-direction: column;
+     gap: 5px;
+ }
+ .filter-group label {
+     font-size: 0.75rem;
+     font-weight: 600;
+     color: #64748b;
+ }
+ .filter-input {
+     padding: 10px;
+     border: 1px solid #cbd5e1;
+     border-radius: 6px;
+     font-family: 'Inter', sans-serif;
+     color: #1e293b;
+     min-width: 150px;
+ }
+ .btn-primary {
+     background: #1b4332;
+     color: white;
+     padding: 10px 20px;
+     border: none;
+     border-radius: 6px;
+     font-weight: 600;
+     cursor: pointer;
+     transition: background 0.2s;
+ }
+ .btn-primary:hover {
+     background: #14532d;
+ }
+ .btn-outline {
+     background: white;
+     color: #1b4332;
+     border: 1px solid #1b4332;
+     padding: 10px 20px;
+     border-radius: 6px;
+     font-weight: 600;
+     cursor: pointer;
+ }
+ .report-view {
+     background: white;
+     border-radius: 12px;
+     border: 1px solid #e2e8f0;
+     padding: 20px;
+     flex-grow: 1;
+     display: flex;
+     flex-direction: column;
+ }

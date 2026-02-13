@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | PHINMA UPang</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+    <aside>
+        <div class="sidebar-logo">
+            <h1 style="font-size: 1.2rem; margin: 0; font-weight: 700;">PHINMA UPang</h1>
+            <span style="font-size: 0.7rem; opacity: 0.6; letter-spacing: 0.5px;">ADMIN DASHBOARD</span>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item active" onclick="location.href='dashboard.html'">Dashboard</li>
+            <li class="nav-item" onclick="location.href='monitoring.html'">Room Management</li>
+            <li class="nav-item" onclick="location.href='reports.html'">Reports</li>
+            <li class="nav-item" onclick="location.href='../index.html'" style="margin-top: auto; color: #ef4444;">Logout</li>
+        </ul>
+        <div style="font-size: 0.7rem; opacity: 0.4; margin-top: auto;">Andrea Evangelista</div>
+    </aside>
+
+    <div class="content-area">
+        <header>
+            <div style="font-weight: 700; color: #1b4332; font-size: 1.1rem;">Campus Overview</div>
+            <div style="display: flex; align-items: center; gap: 24px;">
+                <div class="notification-wrapper">
+                    <div class="notification-bell" onclick="toggleNotifications()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">1</span>
+                    </div>
+                    <div id="notificationDropdown" class="notification-dropdown">
+                        <div class="dropdown-header">
+                            <span>Notifications</span>
+                            <span style="font-size: 0.7rem; font-weight: 400; opacity: 0.7;">1 Unread</span>
+                        </div>
+                        <div class="notification-list">
+                            <div class="notification-item unread" onclick="location.href='alerts.html'">
+                                <div class="notification-title">High Temperature Alert</div>
+                                <div class="notification-desc">PTC 306 temperature is 32.5°C, exceeding safe threshold.</div>
+                                <div class="notification-time">2 minutes ago</div>
+                            </div>
+                            <div class="notification-item" onclick="location.href='alerts.html'">
+                                <div class="notification-title">Air Quality Warning</div>
+                                <div class="notification-desc">PTC 201 air quality index (AQI) has reached 120.</div>
+                                <div class="notification-time">1 hour ago</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="alerts.html" class="view-all-link">View All Alerts</a>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <p id="clock" style="font-weight: 700; color: #1b4332; margin:0; font-variant-numeric: tabular-nums;">00:00:00</p>
+                    <p id="date" style="font-size: 0.75rem; color: #64748b; margin:0;"></p>
+                </div>
+            </div>
+        </header>   
+
+        <div class="dashboard-grid">
+            <div class="occupancy-summary">
+                <div class="stat-box" style="background: #1b4332; color: white; border: none;">
+                    <span class="label-tiny" style="color: rgba(255,255,255,0.7)">Total Rooms</span>
+                    <div style="font-size: 2.2rem; font-weight: 800;">24</div>
+                </div>
+                <div class="stat-box" onclick="location.href='available-rooms.html'" style="cursor: pointer; transition: transform 0.2s;">
+                    <span class="label-tiny" style="color: #16a34a;">Vacant</span>
+                    <div style="font-size: 2.2rem; font-weight: 800; color: #16a34a;">14</div>
+                </div>
+                <div class="stat-box" onclick="location.href='occupied-rooms.html'" style="cursor: pointer; transition: transform 0.2s;">
+                    <span class="label-tiny" style="color: #dc2626;">Occupied</span>
+                    <div style="font-size: 2.2rem; font-weight: 800; color: #dc2626;">10</div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="data-card">
+                    <span class="label-tiny">Occupancy Ratio</span>
+                    <div style="flex-grow: 1; position: relative; width: 100%; min-height: 0;">
+                        <canvas id="occPie"></canvas>
+                    </div>
+                </div>
+                <div class="data-card">
+                    <span class="label-tiny">Sensor Anomaly: PTC 306 (3PM Spike)</span>
+                    <div style="flex-grow: 1; position: relative; width: 100%; min-height: 0;">
+                         <canvas id="tempLine"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-card room-map-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="label-tiny" style="margin-bottom: 0;">PTC Building Live Room Map</span>
+                    <span style="font-size: 0.7rem; color: #64748b;">Real-time updates</span>
+                </div>
+                <div class="room-grid">
+                    <div class="room-unit room-free">101<span>FREE</span></div>
+                    <div class="room-unit room-free">102<span>FREE</span></div>
+                    <div class="room-unit room-busy">201<span>BUSY</span></div>
+                    <div class="room-unit room-busy">202<span>BUSY</span></div>
+                    <div class="room-unit room-free">203<span>FREE</span></div>
+                    <div class="room-unit room-free">204<span>FREE</span></div>
+                    <div class="room-unit room-busy">301<span>BUSY</span></div>
+                    <div class="room-unit room-busy">302<span>BUSY</span></div>
+                    <div class="room-unit room-free">303<span>FREE</span></div>
+                    <div class="room-unit room-free">304<span>FREE</span></div>
+                    <div class="room-unit room-free">305<span>FREE</span></div>
+                    <div class="room-unit room-free">401<span>FREE</span></div>
+                    <div class="room-unit room-busy">402<span>BUSY</span></div>
+                    <div class="room-unit room-free">403<span>FREE</span></div>
+                    <div class="room-unit room-free">404<span>FREE</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.closest('.notification-wrapper')) {
+                const dropdown = document.getElementById('notificationDropdown');
+                if (dropdown && dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour12: false});
+            document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        const ctxPie = document.getElementById('occPie').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Available', 'Occupied'],
+                datasets: [{
+                    data: [14, 10],
+                    backgroundColor: ['#22c55e', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: { 
+                maintainAspectRatio: false,
+                cutout: '75%', 
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true } } } 
+            }
+        });
+
+        const ctxLine = document.getElementById('tempLine').getContext('2d');
+        new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: ['12pm', '1pm', '2pm', '3pm', '4pm', '5pm'],
+                datasets: [{
+                    label: 'Temp °C',
+                    data: [24, 25, 27, 50, 32, 26],
+                    borderColor: '#ef4444',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                    pointRadius: 3
+                }]
+            },
+            options: { 
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: false, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

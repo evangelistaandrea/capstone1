@@ -1,0 +1,253 @@
+
+
+* { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+:root { 
+    --school-green: #1b4332; 
+    --paper-white: #ffffff; 
+    --desk-gray: #f2f4f7; 
+    --border-ink: #e2e8f0; 
+    --text-main: #1e293b;
+    --text-sub: #64748b;
+    --accent-green: #2d6a4f;
+}
+
+body { background: var(--desk-gray); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+
+/* Sidebar */
+aside {
+    width: 260px; background: var(--school-green); color: white;
+    display: flex; flex-direction: column; padding: 24px; border-right: 1px solid var(--border-ink);
+    flex-shrink: 0;
+}
+.sidebar-logo { margin-bottom: 40px; }
+.nav-list { list-style: none; padding: 0; margin: 0; flex-grow: 1; display: flex; flex-direction: column; }
+.nav-item { 
+    padding: 12px 16px; border-radius: 8px; margin-bottom: 4px; 
+    cursor: pointer; font-weight: 500; font-size: 0.9rem; transition: all 0.2s; color: rgba(255,255,255,0.7);
+}
+.nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: white; }
+.nav-item.active { font-weight: 700; background: rgba(255,255,255,0.2); }
+
+/* Main Content */
+.content-area { 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    padding: 24px; 
+    gap: 20px; 
+    height: 100vh;
+    overflow: hidden; 
+}
+
+/* Header */
+header {
+    background: var(--paper-white); padding: 16px 24px; border-radius: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border-ink);
+    flex-shrink: 0;
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Stats Row */
+.occupancy-summary { 
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; 
+    flex-shrink: 0;
+}
+.stat-box { 
+    padding: 20px; border-radius: 12px; text-align: center; 
+    background: var(--paper-white); border: 1px solid var(--border-ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Charts Row */
+.charts-row { 
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; 
+    height: 250px; /* Slightly adjusted to accommodate chart contents properly */
+    flex-shrink: 0;
+}
+.data-card { 
+    background: var(--paper-white); padding: 20px; border-radius: 12px; border: 1px solid var(--border-ink); 
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    display: flex; flex-direction: column;
+    height: 100%;
+    overflow: hidden; /* Prevent charts from spilling out */
+    position: relative;
+}
+
+/* Notification Bell & Dropdown */
+.notification-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.notification-bell {
+    cursor: pointer;
+    position: relative;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--school-green);
+}
+
+.notification-bell:hover {
+    background: #f1f5f9;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 320px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-ink);
+    margin-top: 10px;
+    z-index: 1000;
+    display: none; /* Hidden by default */
+}
+
+.notification-dropdown.show {
+    display: block;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-ink);
+    font-weight: 700;
+    color: var(--school-green);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-list {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notification-item:hover {
+    background: #f8fafc;
+}
+
+.notification-item.unread {
+    background: #f0f9ff;
+}
+
+.notification-item.unread:hover {
+    background: #e0f2fe;
+}
+
+.notification-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    color: #1e293b;
+}
+
+.notification-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.notification-time {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-top: 6px;
+}
+
+.dropdown-footer {
+    padding: 12px;
+    text-align: center;
+    border-top: 1px solid var(--border-ink);
+}
+
+.view-all-link {
+    color: var(--school-green);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.view-all-link:hover {
+    text-decoration: underline;
+}
+
+/* Room Map - takes remaining space */
+.room-map-card {
+    flex-grow: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.room-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
+    gap: 12px; 
+    margin-top: 15px; 
+    overflow-y: auto; 
+    padding-right: 5px;
+    flex: 1;
+}
+.room-unit {
+    aspect-ratio: 1.2;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    border-radius: 8px; 
+    font-size: 0.85rem; font-weight: 600; border: 1px solid transparent;
+}
+.room-free { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+.room-busy { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+
+/* Utilities */
+.label-tiny { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: var(--text-sub); margin-bottom: 12px; display: block; }
+.exit-btn { 
+    background: white; color: #ef4444; border: 1px solid #fee2e2; 
+    padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+}
+.exit-btn:hover { background: #fee2e2; border-color: #fecaca; }

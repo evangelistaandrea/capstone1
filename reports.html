@@ -1,0 +1,140 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports | Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="reports.css">
+</head>
+<body>
+
+    <aside>
+        <div class="sidebar-logo">
+            <h1 style="font-size: 1.2rem; margin: 0; font-weight: 700;">PHINMA UPang</h1>
+            <span style="font-size: 0.7rem; opacity: 0.6; letter-spacing: 0.5px;">ADMIN DASHBOARD</span>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item" onclick="location.href='dashboard.html'">Dashboard</li>
+            <li class="nav-item" onclick="location.href='monitoring.html'">Room Management</li>
+            <li class="nav-item active">Reports</li>
+            <li class="nav-item" onclick="location.href='../index.html'" style="margin-top: auto; color: #ef4444;">Logout</li>
+        </ul>
+        <div style="font-size: 0.7rem; opacity: 0.4; margin-top: auto;">Version 2.1.0</div>
+    </aside>
+
+    <div class="content-area">
+        <header>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="font-weight: 700; color: #1b4332; font-size: 1.1rem;">System Reports</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 24px;">
+                <div class="notification-wrapper">
+                    <div class="notification-bell" onclick="toggleNotifications()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">1</span>
+                    </div>
+                    <div id="notificationDropdown" class="notification-dropdown">
+                        <div class="dropdown-header">
+                            <span>Notifications</span>
+                            <span style="font-size: 0.7rem; font-weight: 400; opacity: 0.7;">1 Unread</span>
+                        </div>
+                        <div class="notification-list">
+                            <div class="notification-item unread" onclick="location.href='alerts.html'">
+                                <div class="notification-title">High Temperature Alert</div>
+                                <div class="notification-desc">PTC 306 temperature is 32.5°C, exceeding safe threshold.</div>
+                                <div class="notification-time">2 minutes ago</div>
+                            </div>
+                            <div class="notification-item" onclick="location.href='alerts.html'">
+                                <div class="notification-title">Air Quality Warning</div>
+                                <div class="notification-desc">PTC 201 air quality index (AQI) has reached 120.</div>
+                                <div class="notification-time">1 hour ago</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="alerts.html" class="view-all-link">View All Alerts</a>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <p id="clock" style="font-weight: 700; color: #1b4332; margin:0; font-variant-numeric: tabular-nums;">00:00:00</p>
+                    <p id="date" style="font-size: 0.75rem; color: #64748b; margin:0;"></p>
+                </div>
+            </div>
+        </header>
+
+        <div style="display: flex; flex-direction: column; height: calc(100vh - 80px);">
+            <!-- Filters -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>Room</label>
+                    <select class="filter-input">
+                        <option value="all">All Rooms</option>
+                        <option value="101">Room 101</option>
+                        <option value="102">Room 102</option>
+                        <option value="306">Room 306</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Date</label>
+                    <input type="date" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label>Time Range</label>
+                    <input type="time" class="filter-input">
+                </div>
+                <button class="btn-primary" onclick="alert('Report Generated!')">Generate Report</button>
+            </div>
+
+            <!-- Report View -->
+            <div class="report-view">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <span class="label-tiny" style="margin-bottom: 0;">Generated Report View</span>
+                    <button class="btn-outline" onclick="alert('Exporting Report...')">Export PDF/CSV</button>
+                </div>
+                
+                <div style="flex-grow: 1; border: 1px dashed #cbd5e1; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #64748b; background: #f8fafc;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; opacity: 0.2;">📊</div>
+                        <p>Select filters and click Generate to view data</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.closest('.notification-wrapper')) {
+                const dropdown = document.getElementById('notificationDropdown');
+                if (dropdown && dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour12: false});
+            document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+        
+        // Set today's date as default
+        document.querySelector('input[type="date"]').valueAsDate = new Date();
+    </script>
+</body>
+</html>
