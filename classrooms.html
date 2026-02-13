@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHINMA UPang | Classrooms</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --school-green: #1b4332;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-400: #94a3b8;
+            --slate-600: #64748b;
+            --slate-900: #0f172a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            padding-top: 20px;
+        }
+
+        .toast {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--slate-900); color: white; padding: 14px 28px;
+            border-radius: 12px; font-weight: 600; font-size: 0.9rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 9999;
+        }
+        .toast.show { top: 30px; }
+
+        .dashboard-container { width: 95%; max-width: 1400px; display: flex; flex-direction: column; height: 100%; }
+
+        header {
+            background: white; padding: 15px 25px; border-radius: 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04); border: 1px solid var(--slate-200);
+            margin-bottom: 30px;
+        }
+
+        .brand-section { display: flex; align-items: center; gap: 12px; }
+        .logo-container { width: 45px; height: 45px; display: flex; align-items: center; }
+        .logo-container img { width: 100%; height: 100%; object-fit: contain; }
+        .brand-text h1 { margin: 0; font-size: 1.2rem; color: var(--school-green); font-weight: 600; }
+        
+        .guest-status {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #f1f5f9; padding: 4px 10px; border-radius: 6px; margin-top: 2px;
+        }
+        .guest-status .dot { width: 6px; height: 6px; background: var(--slate-600); border-radius: 50%; }
+        .guest-status span { font-size: 0.65rem; font-weight: 700; color: var(--slate-600); text-transform: uppercase; }
+
+        .search-area { flex-grow: 1; max-width: 350px; margin: 0 30px; }
+        .search-area input {
+            width: 100%; padding: 12px 20px; border-radius: 12px;
+            border: 1px solid var(--slate-200); background: #f8fafc; outline: none; font-family: 'Inter';
+        }
+
+        .exit-btn { background: #fee2e2; color: #dc2626; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; }
+
+        .main-layout { display: grid; grid-template-columns: 280px 1fr; gap: 30px; height: calc(100vh - 150px); padding-bottom: 20px; }
+
+        .building-sidebar { display: flex; flex-direction: column; gap: 10px; }
+        
+        .b-card {
+            padding: 16px; border-radius: 12px; background: white;
+            color: var(--slate-900); font-weight: 700;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 2px solid var(--slate-200); cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .b-card:hover:not(.disabled):not(.active) { border-color: var(--school-green); }
+        
+        .b-card.active { border: 2px solid var(--school-green); color: var(--school-green); }
+        .b-card.disabled {
+            background: #f8fafc;
+            color: var(--slate-400);
+            border: 1px dashed var(--slate-200);
+            cursor: not-allowed;
+        }
+        
+        .no-sensor-label { font-size: 0.6rem; background: var(--slate-200); padding: 3px 7px; border-radius: 4px; color: var(--slate-600); }
+
+        .room-area { overflow-y: auto; padding-right: 15px; }
+        .floor-section { margin-bottom: 30px; }
+        .floor-title {
+            font-size: 0.8rem; font-weight: 800; color: var(--slate-600);
+            text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 15px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .floor-title::after { content: ''; flex-grow: 1; height: 1px; background: var(--slate-200); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+
+        .room-card {
+            background: white; padding: 40px 20px; border-radius: 20px;
+            border: 2px solid var(--slate-200); display: flex; flex-direction: column; 
+            align-items: center; cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+        /* BORDER ONLY HOVER - ROOM CARDS */
+        .room-card:hover:not(.disabled) { border-color: var(--school-green); }
+        
+        .room-card.disabled { opacity: 0.5; background: #f1f5f9; border-style: dashed; cursor: not-allowed; }
+        .room-name { font-size: 1.4rem; font-weight: 900; color: var(--school-green); }
+
+        .status-tag { font-size: 0.55rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; margin-bottom: 12px; text-transform: uppercase; }
+        .tag-live { background: #dcfce7; color: #16a34a; }
+        .tag-none { background: var(--slate-200); color: var(--slate-600); }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast">No sensor found.</div>
+
+    <div class="dashboard-container">
+        <header>
+            <div class="brand-section">
+                <div class="logo-container"><img src="logo.png" alt="Logo"></div>
+                <div class="brand-text">
+                    <h1>PHINMA UPang</h1>
+                    <div class="guest-status">
+                        <div class="dot"></div>
+                        <span>Viewing as Guest</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-area">
+                <input type="text" id="roomSearch" placeholder="Search room..." onkeyup="filterRooms()">
+            </div>
+
+            <button class="exit-btn" onclick="location.href='buildings.html'">BACK</button>
+        </header>
+
+        <div class="main-layout">
+            <div class="building-sidebar">
+                <div class="b-card active">PTC Building</div>
+                <div class="b-card disabled" onclick="showToast('No sensors for MBA')">MBA <span class="no-sensor-label">No Sensor</span></div>
+                <div class="b-card disabled" onclick="showToast('No sensors for CMA')">CMA <span class="no-sensor-label">No Sensor</span></div>
+                <div class="b-card disabled" onclick="showToast('No sensors for BE')">BE <span class="no-sensor-label">No Sensor</span></div>
+                <div class="b-card disabled" onclick="showToast('No sensors for RIVERSIDE')">RIVERSIDE <span class="no-sensor-label">No Sensor</span></div>
+            </div>
+
+            <div class="room-area">
+                <div class="floor-section">
+                    <div class="floor-title">2nd Floor</div>
+                    <div class="grid">
+                        <div class="room-card" onclick="goToMonitor('PTC 201')">
+                            <div class="status-tag tag-live">Active Sensor</div>
+                            <span class="room-name">PTC 201</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="floor-section">
+                    <div class="floor-title">3rd Floor</div>
+                    <div class="grid">
+                        <div class="room-card disabled" onclick="showToast('PTC 303 has no sensor')">
+                            <div class="status-tag tag-none">No Sensor</div>
+                            <span class="room-name">PTC 303</span>
+                        </div>
+                        <div class="room-card" onclick="goToMonitor('PTC 304')">
+                            <div class="status-tag tag-live">Active Sensor</div>
+                            <span class="room-name">PTC 304</span>
+                        </div>
+                        <div class="room-card" onclick="goToMonitor('PTC 305')">
+                            <div class="status-tag tag-live">Active Sensor</div>
+                            <span class="room-name">PTC 305</span>
+                        </div>
+                        <div class="room-card" onclick="goToMonitor('PTC 306')">
+                            <div class="status-tag tag-live">Active Sensor</div>
+                            <span class="room-name">PTC 306</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="floor-section">
+                    <div class="floor-title">4th Floor</div>
+                    <div class="grid">
+                        <div class="room-card" onclick="goToMonitor('PTC 403')">
+                            <div class="status-tag tag-live">Active Sensor</div>
+                            <span class="room-name">PTC 403</span>
+                        </div>
+                        <div class="room-card" onclick="goToMonitor('PTC 404')">
+                            <div class="status-tag tag-live">Active Sensor</div>
+                            <span class="room-name">PTC 404</span>
+                        </div>
+                        <div class="room-card" onclick="goToMonitor('PTC 405')">
+                            <div class="status-tag tag-live">Active Sensor</div>
+                            <span class="room-name">PTC 405</span>
+                        </div>
+                        <div class="room-card" onclick="goToMonitor('PTC 406')">
+                            <div class="status-tag tag-live">Active Sensor</div>
+                            <span class="room-name">PTC 406</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function goToMonitor(roomName) {
+            localStorage.setItem('selectedRoom', roomName);
+            window.location.href = 'monitor.html';
+        }
+
+        function filterRooms() {
+            const input = document.getElementById('roomSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.room-card');
+            cards.forEach(card => {
+                const nameElement = card.querySelector('.room-name');
+                if (nameElement) {
+                    const name = nameElement.innerText.toLowerCase();
+                    card.style.display = name.includes(input) ? "flex" : "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

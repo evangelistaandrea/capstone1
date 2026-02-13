@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome | PHINMA UPang CMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --school-green: #1b4332; 
+            --paper-white: #ffffff; 
+            --desk-gray: #f2f4f7; 
+            --accent-green: #2d6a4f;
+            --text-slate: #475569;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background: var(--desk-gray); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            background-image: linear-gradient(135deg, #f2f4f7 0%, #e2e8f0 100%);
+        }
+        
+        .welcome-container {
+            background: var(--paper-white); 
+            padding: 50px 40px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            width: 100%; 
+            max-width: 480px; 
+            text-align: center;
+        }
+
+        .logo-img { height: 100px; margin-bottom: 20px; }
+        
+        h1 { 
+            font-weight: 900; 
+            color: var(--school-green); 
+            font-size: 1.8rem; 
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+
+        p.subtitle {
+            color: var(--text-slate);
+            font-size: 1rem;
+            margin-bottom: 35px;
+        }
+
+        .selection-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            display: block;
+            text-decoration: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .admin-choice {
+            background: var(--school-green);
+            color: white;
+        }
+
+        .admin-choice:hover {
+            background: var(--accent-green);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(27, 67, 50, 0.2);
+        }
+
+        .guest-choice {
+            background: white;
+            color: var(--school-green);
+            border: 2px solid var(--school-green);
+        }
+
+        .guest-choice:hover {
+            background: #f0fdf4;
+            transform: translateY(-2px);
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="welcome-container">
+        <img src="logo.png" alt="PHINMA Logo" class="logo-img">
+        
+        <h1>Smart Classroom Monitoring System</h1>
+        <p class="subtitle">Please select your access level to continue</p>
+
+        <div class="selection-box">
+            <a href="index.html" class="choice-btn admin-choice">
+                LOGIN AS ADMIN
+            </a>
+
+            <button onclick="continueAsGuest()" class="choice-btn guest-choice">
+                CONTINUE AS GUEST
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function continueAsGuest() {
+            localStorage.setItem('currentUser', 'Guest');
+            localStorage.setItem('authStatus', 'guest');
+            window.location.href = 'buildings.html';
+        }
+    </script>
+</body>
+</html>
