@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHINMA UPang | Monitoring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --school-green: #1b4332;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-400: #94a3b8;
+            --slate-600: #64748b;
+            --slate-900: #0f172a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; height: 100vh; display: flex; flex-direction: column; align-items: center; padding-top: 20px; overflow: hidden; }
+
+        .dashboard-container { width: 95%; max-width: 1400px; }
+
+        header {
+            background: white; padding: 15px 25px; border-radius: 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04); border: 1px solid var(--slate-200);
+            margin-bottom: 40px;
+        }
+
+        .brand-section { display: flex; align-items: center; gap: 12px; }
+        .logo-container { width: 45px; height: 45px; display: flex; align-items: center; }
+        .logo-container img { width: 100%; height: 100%; object-fit: contain; }
+        .brand-text h1 { margin: 0; font-size: 1.2rem; color: var(--school-green); font-weight: 600; }
+        
+        .guest-status {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #f1f5f9; padding: 4px 10px; border-radius: 6px; margin-top: 2px;
+        }
+        .guest-status .dot { width: 6px; height: 6px; background: var(--slate-600); border-radius: 50%; }
+        .guest-status span { font-size: 0.65rem; font-weight: 700; color: var(--slate-600); text-transform: uppercase; }
+
+        .search-area { flex-grow: 1; max-width: 300px; margin: 0 30px; }
+        .search-area input {
+            width: 100%; padding: 12px 18px; border-radius: 12px;
+            border: 1px solid var(--slate-200); background: #f8fafc; outline: none; font-family: 'Inter';
+            appearance: none; -webkit-appearance: none;
+        }
+        input::-webkit-calendar-picker-indicator { display: none !important; }
+
+        .time-group { text-align: right; margin-right: 20px; border-right: 1px solid var(--slate-200); padding-right: 20px; }
+        #clock { font-size: 1.3rem; font-weight: 800; color: var(--school-green); margin: 0; }
+        #date-day { font-size: 0.7rem; color: var(--slate-600); margin: 0; }
+
+        .nav-buttons { display: flex; gap: 10px; align-items: center; }
+
+        .home-btn { 
+            background: var(--school-green); color: white; border: none; padding: 12px 20px; 
+            border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; text-transform: uppercase; font-size: 0.8rem;
+        }
+        .exit-btn { background: #fee2e2; color: #dc2626; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
+
+        .active-room-info { margin-bottom: 30px; padding-left: 10px; position: relative; }
+        .building-title { font-size: 2.5rem; font-weight: 900; color: var(--school-green); letter-spacing: -1px; margin-bottom: 5px; }
+        
+        .room-meta { display: flex; align-items: center; gap: 12px; }
+        .monitoring-label { font-size: 1rem; color: var(--slate-600); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .room-highlight { color: var(--school-green); background: #dcfce7; padding: 2px 8px; border-radius: 6px; font-weight: 700; }
+        .room-type-label { font-size: 0.7rem; font-weight: 800; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.5px; border-left: 2px solid var(--slate-200); padding-left: 12px; }
+        
+        #data-mode-label { font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; margin-left: 5px; }
+
+        .monitoring-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+        .monitor-card {
+            background: white; padding: 50px 20px; border-radius: 28px; border: 1px solid var(--slate-200);
+            display: flex; flex-direction: column; justify-content: space-between; align-items: center; height: 420px;
+        }
+        .monitor-card.primary { background: var(--school-green); color: white; border: none; transition: none; }
+        .label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--slate-600); }
+        .primary .label { color: rgba(255,255,255,0.7); }
+        .reading { font-size: 2.5rem; font-weight: 900; color: var(--school-green); }
+        .primary .reading { color: white; }
+        .unit { font-size: 1.1rem; opacity: 0.5; }
+
+        .status-badge { font-size: 0.75rem; font-weight: 800; padding: 12px 20px; border-radius: 12px; background: #f0fdf4; color: #22c55e; width: 90%; text-align: center; text-transform: uppercase; }
+        .primary .status-badge { background: rgba(255,255,255,0.2); color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <header>
+            <div class="brand-section">
+                <div class="logo-container">
+                    <img src="logo.png" alt="Logo">
+                </div>
+                <div class="brand-text">
+                    <h1 style="font-weight: 900; font-size: 1.2rem; color: var(--school-green);">PHINMA University of Pangasinan</h1>
+                    <div class="guest-status">
+                        <div class="dot"></div>
+                        <span>Viewing as Guest</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-area">
+                <input type="text" id="roomSwitcher" placeholder="Search room..." autocomplete="off">
+                <datalist id="all-rooms">
+                    <option value="PTC 201"><option value="PTC 302"></option><option value="PTC 303"><option value="PTC 304"><option value="PTC 305">
+                    <option value="PTC 306"><option value="PTC 403"><option value="PTC 404">
+                    <option value="PTC 405"><option value="PTC 406">
+                    <option value="ITS 200"><option value="ITS 201">
+                </datalist>
+            </div>
+
+            <div class="nav-buttons">
+                <div class="time-group">
+                    <p id="clock">00:00:00</p>
+                    <p id="date-day">Loading...</p>
+                </div>
+                <button class="home-btn" onclick="location.href='welcome.html'">Home</button>
+                <button class="exit-btn" onclick="location.href='classrooms.html'">BACK</button>
+            </div>
+        </header>
+
+        <div class="active-room-info">
+            <h1 class="building-title" id="buildingDisplay">PTC Building</h1>
+            <div class="room-meta">
+                <div class="monitoring-label">
+                    Monitoring: <span class="room-highlight" id="displayRoom">Loading...</span>
+                    <span id="data-mode-label">---</span>
+                </div>
+                <div class="room-type-label" id="roomTypeDisplay">LECTURE ROOM</div>
+            </div>
+        </div>
+
+        <div class="monitoring-grid">
+            <div class="monitor-card primary">
+                <span class="label">Room Status</span>
+                <span class="reading" id="motionStatus">--</span>
+                <span class="status-badge" id="motionBadge">--</span>
+            </div>
+            <div class="monitor-card">
+                <span class="label">Temperature</span>
+                <span class="reading"><span id="tempReading">--</span><span class="unit">°C</span></span>
+                <span class="status-badge" id="tempBadge">--</span>
+            </div>
+            <div class="monitor-card">
+                <span class="label">Humidity</span>
+                <span class="reading"><span id="humReading">--</span><span class="unit">%</span></span>
+                <span class="status-badge" id="humBadge">--</span>
+            </div>
+            <div class="monitor-card">
+                <span class="label">Air Quality</span>
+                <span class="reading"><span id="gasReading">--</span><span class="unit"> AQI</span></span>
+                <span class="status-badge" id="gasBadge">--</span>
+            </div>
+            <div class="monitor-card">
+                <span class="label">Lighting</span>
+                <span class="reading"><span id="ldrReading">--</span><span class="unit"> Lx</span></span>
+                <span class="status-badge" id="ldrBadge">--</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const mockRooms = {
+            "PTC 302": { type: "Lecture Room", temp: 28.0, hum: 30, gas: 30, ldr: 100, motion: 0, status: "VACANT", badge: "No Motion" },
+            "PTC 303": { type: "Laboratory", temp: 25.0, hum: 40, gas: 30, ldr: 400, motion: 0, status: "VACANT", badge: "No Motion" },
+            "PTC 304": { type: "Laboratory", temp: 24.1, hum: 45, gas: 42, ldr: 450, motion: 0, status: "VACANT", badge: "No Motion" },
+            "PTC 305": { type: "Laboratory", temp: 22.5, hum: 55, gas: 35, ldr: 120, motion: 1, status: "OCCUPIED", badge: "Motion Detected" },
+            "PTC 306": { type: "Laboratory", temp: 26.9, hum: 62, gas: 140, ldr: 880, motion: 0, status: "VACANT", badge: "No Motion" },
+            "PTC 403": { type: "Lecture Room", temp: 23.2, hum: 40, gas: 28, ldr: 300, motion: 1, status: "OCCUPIED", badge: "Motion Detected" },
+            "PTC 404": { type: "Lecture Room", temp: 25.4, hum: 44, gas: 40, ldr: 500, motion: 0, status: "VACANT", badge: "No Motion" },
+            "PTC 405": { type: "Lecture Room", temp: 21.0, hum: 58, gas: 50, ldr: 150, motion: 1, status: "OCCUPIED", badge: "Motion Detected" },
+            "PTC 406": { type: "Lecture Room", temp: 24.8, hum: 49, gas: 42, ldr: 410, motion: 0, status: "VACANT", badge: "No Motion" },
+            "ITS 200": { type: "Computer Lab", temp: 21.5, hum: 52, gas: 38, ldr: 600, motion: 1, status: "OCCUPIED", badge: "Motion Detected" },
+            "ITS 201": { type: "Computer Lab", temp: 22.8, hum: 50, gas: 41, ldr: 580, motion: 0, status: "VACANT", badge: "No Motion" }
+        };
+
+        const displayRoom = document.getElementById('displayRoom');
+        const roomTypeDisplay = document.getElementById('roomTypeDisplay');
+        const buildingDisplay = document.getElementById('buildingDisplay');
+        const modeLabel = document.getElementById('data-mode-label');
+        const roomInput = document.getElementById('roomSwitcher');
+        const socket = io(undefined, { reconnection: true, transports: ['websocket', 'polling'] });
+        let motionTimeoutId = null;
+
+        function updateRoom(name) {
+            const roomName = name.toUpperCase();
+            
+            buildingDisplay.innerText = roomName.startsWith("ITS") ? "ITS Building" : "PTC Building";
+
+            if (roomName === "PTC 201" || mockRooms[roomName]) {
+                displayRoom.innerText = roomName;
+                localStorage.setItem('selectedRoom', roomName);
+
+                if (roomName === "PTC 201") {
+                    roomTypeDisplay.innerText = "MAC LAB";
+                    modeLabel.innerText = "● LIVE SENSOR";
+                    modeLabel.style.background = "#dcfce7";
+                    modeLabel.style.color = "#16a34a";
+                    if (socket.disconnected) socket.connect();
+                    fetchLatestRealData();
+                } else {
+                    roomTypeDisplay.innerText = mockRooms[roomName].type.toUpperCase();
+                    modeLabel.innerText = "○ SIMULATED DATA";
+                    modeLabel.style.background = "#e2e8f0";
+                    modeLabel.style.color = "#64748b";
+                    socket.disconnect();
+                    loadMockData(roomName);
+                }
+            }
+        }
+
+        function loadMockData(roomName) {
+            const data = mockRooms[roomName];
+            updateSensorDisplay({
+                temperature: data.temp,
+                humidity: data.hum,
+                motion: data.motion,
+                gas_detected: data.gas > 100 ? 1 : 0,
+                ldr: (data.ldr / 1000) * 4095
+            }, true);
+            document.getElementById('motionStatus').innerText = data.status;
+            document.getElementById('motionBadge').innerText = data.badge;
+        }
+
+        function updateSensorDisplay(data, isMock = false) {
+            if (data.temperature !== undefined) {
+                document.getElementById('tempReading').innerText = data.temperature;
+                const b = document.getElementById('tempBadge');
+                if (data.temperature < 20) { b.innerText = 'COLD'; b.style.background = '#dbeafe'; b.style.color = '#0284c7'; }
+                else if (data.temperature > 28) { b.innerText = 'HOT'; b.style.background = '#fee2e2'; b.style.color = '#dc2626'; }
+                else { b.innerText = 'NORMAL'; b.style.background = '#f0fdf4'; b.style.color = '#22c55e'; }
+            }
+            if (data.humidity !== undefined) {
+                document.getElementById('humReading').innerText = data.humidity;
+                const b = document.getElementById('humBadge');
+                if (data.humidity < 30) { b.innerText = 'DRY'; b.style.background = '#fef3c7'; b.style.color = '#d97706'; }
+                else { b.innerText = 'IDEAL'; b.style.background = '#f0fdf4'; b.style.color = '#22c55e'; }
+            }
+            if (data.motion !== undefined) {
+                const card = document.querySelector('.monitor-card.primary');
+                if (data.motion === 1) {
+                    document.getElementById('motionStatus').innerText = 'OCCUPIED';
+                    document.getElementById('motionBadge').innerText = 'Motion Detected';
+                    card.style.opacity = '1';
+                    if (motionTimeoutId) clearTimeout(motionTimeoutId);
+                } else if (!isMock) {
+                    if (!motionTimeoutId) {
+                        motionTimeoutId = setTimeout(() => {
+                            document.getElementById('motionStatus').innerText = 'VACANT';
+                            document.getElementById('motionBadge').innerText = 'No Motion';
+                            card.style.opacity = '1'; 
+                        }, 60000);
+                    }
+                } else { card.style.opacity = '1'; } 
+            }
+            if (data.gas_detected !== undefined) {
+                const b = document.getElementById('gasBadge');
+                document.getElementById('gasReading').innerText = data.gas_detected === 1 ? '150' : '45';
+                if (data.gas_detected === 1) { b.innerText = 'POOR'; b.style.background = '#fee2e2'; b.style.color = '#dc2626'; }
+                else { b.innerText = 'GOOD'; b.style.background = '#f0fdf4'; b.style.color = '#22c55e'; }
+            }
+            if (data.ldr !== undefined) {
+                const lux = Math.round((data.ldr / 4095) * 1000);
+                document.getElementById('ldrReading').innerText = lux;
+                const b = document.getElementById('ldrBadge');
+                b.innerText = lux < 200 ? 'DIM' : 'IDEAL';
+                b.style.background = lux < 200 ? '#fef3c7' : '#f0fdf4';
+            }
+        }
+
+        function fetchLatestRealData() {
+            fetch('/api/sensors/latest').then(res => res.json()).then(data => { if (data) updateSensorDisplay(data); });
+        }
+
+        socket.on('sensorUpdate', (data) => { if (localStorage.getItem('selectedRoom') === "PTC 201") updateSensorDisplay(data); });
+
+        roomInput.addEventListener('input', function() {
+            if (this.value.length > 0) this.setAttribute('list', 'all-rooms');
+            const options = document.getElementById('all-rooms').options;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value.toUpperCase() === this.value.toUpperCase()) {
+                    updateRoom(this.value); this.value = ''; this.blur(); break;
+                }
+            }
+        });
+
+        const savedRoom = localStorage.getItem('selectedRoom') || "PTC 201";
+        updateRoom(savedRoom);
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
+            document.getElementById('date-day').innerText = now.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+        }
+        setInterval(updateClock, 1000); updateClock();
+    </script>
+</body>
+</html>

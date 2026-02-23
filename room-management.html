@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management | PHINMA UPang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --school-green: #143628; 
+            --accent-green: #2d6a4f;
+            --sidebar-text: #e8f5e9;
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-400: #94a3b8;
+            --slate-600: #64748b;
+            --slate-900: #0f172a;
+            --critical-red: #dc2626;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--slate-50); height: 100vh; display: flex; overflow: hidden; }
+
+        .side-nav {
+            width: 270px; background: var(--school-green); 
+            display: flex; flex-direction: column; padding: 35px 20px; flex-shrink: 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+        .nav-logo { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 50px; text-align: center; }
+        .logo-box { width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid rgba(255,255,255,0.2); }
+        .logo-box img { width: 100%; height: 100%; object-fit: cover; }
+        .nav-logo h2 { font-size: 1.1rem; font-weight: 800; color: white; letter-spacing: -0.5px; line-height: 1.2; }
+
+        .nav-item {
+            padding: 14px 16px; border-radius: 12px; color: var(--sidebar-text);
+            text-decoration: none; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; 
+            cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s ease; opacity: 0.75;
+        }
+        .nav-item.active { background: var(--accent-green); color: white; opacity: 1; }
+        .nav-item:hover:not(.active) { background: rgba(255, 255, 255, 0.08); opacity: 1; }
+        .logout-btn { margin-top: auto; padding: 14px; background: rgba(255, 255, 255, 0.05); color: white; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; }
+        .logout-btn:hover { background: var(--critical-red); border-color: transparent; }
+
+        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        .top-header { background: white; padding: 20px 35px; border-bottom: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .header-titles { flex-shrink: 0; }
+        .header-titles h1 { font-size: 1.4rem; font-weight: 900; color: var(--slate-900); }
+        .header-titles p { font-size: 0.75rem; font-weight: 700; color: #1b4332; text-transform: uppercase; }
+
+        .search-container { position: absolute; left: 60%; transform: translateX(-50%); width: 350px; }
+        .search-box { background: var(--slate-100); padding: 10px 20px; border-radius: 12px; display: flex; align-items: center; border: 1px solid var(--slate-200); }
+        .search-box input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.85rem; font-weight: 600; color: var(--slate-900); }
+
+        .live-clock { text-align: right; flex-shrink: 0; }
+        #time-display { font-size: 1.2rem; font-weight: 900; color: var(--slate-900); display: block; }
+        #date-display { font-size: 0.7rem; font-weight: 600; color: var(--slate-600); }
+
+        .filter-bar { background: white; padding: 8px 35px; border-bottom: 1px solid var(--slate-200); display: flex; gap: 15px; align-items: center; }
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-label { font-size: 0.65rem; font-weight: 900; color: var(--slate-400); text-transform: uppercase; }
+        .filter-chip { 
+            padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; 
+            cursor: pointer; background: var(--slate-100); color: var(--slate-600); border: 1px solid transparent; transition: 0.2s;
+        }
+        .filter-chip.active { background: var(--school-green); color: white; }
+
+        .content-area { padding: 25px 35px; flex-grow: 1; overflow-y: auto; }
+        .table-card { background: white; border-radius: 18px; border: 1px solid var(--slate-200); overflow: hidden; }
+        .room-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .room-table th { padding: 16px 20px; font-size: 0.7rem; font-weight: 800; color: var(--slate-400); text-transform: uppercase; background: var(--slate-50); }
+        .room-table td { padding: 16px 20px; font-size: 0.85rem; font-weight: 600; border-bottom: 1px solid var(--slate-100); }
+
+        .b-divider { background: #f1f5f9; color: var(--school-green); font-weight: 900; font-size: 0.75rem; padding: 10px 20px !important; letter-spacing: 0.5px; }
+        .floor-divider { background: #fafafa; color: var(--slate-600); font-weight: 800; font-size: 0.7rem; padding: 8px 20px !important; border-bottom: 1px solid var(--slate-200); }
+        
+        .status-pill { padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; display: inline-block; }
+        .occupied { background: #fee2e2; color: #dc2626; }
+        .vacant { background: #dcfce7; color: #16a34a; }
+        .sensor-alert { color: var(--critical-red); font-weight: 800; }
+    </style>
+</head>
+<body>
+
+    <nav class="side-nav">
+        <div class="nav-logo">
+            <div class="logo-box"><img src="logo.png" alt="Logo"></div>
+            <h2>PHINMA UPang<br>Admin Dashboard</h2>
+        </div>
+        <div class="nav-item" onclick="location.href='admin.html'">Dashboard</div>
+        <div class="nav-item active" onclick="location.href='room-management.html'">Room Management</div>
+        <div class="nav-item" onclick="location.href='reports.html'">Reports</div>
+        <div class="nav-item" onclick="location.href='iot-management.html'">IoT Management</div>
+        <button class="logout-btn" onclick="location.href='index.html'">LOGOUT SYSTEM</button>
+    </nav>
+
+    <main class="main-wrapper">
+        <header class="top-header">
+            <div class="header-titles">
+                <h1>Room Management</h1>
+                <p>CITE Smart Classroom Monitoring System</p>
+            </div>
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="roomSearch" placeholder="Search room...">
+                </div>
+            </div>
+            <div class="live-clock">
+                <span id="time-display">00:00:00 AM</span>
+                <span id="date-display">MONDAY, FEBRUARY 23, 2026</span>
+            </div>
+        </header>
+
+        <div class="filter-bar">
+            <div class="filter-group">
+                <span class="filter-label">Status:</span>
+                <div class="filter-chip status-chip active" onclick="applyFilters('all', 'status', this)">All</div>
+                <div class="filter-chip status-chip" onclick="applyFilters('occupied', 'status', this)">Occupied</div>
+                <div class="filter-chip status-chip" onclick="applyFilters('vacant', 'status', this)">Vacant</div>
+            </div>
+            <div style="width: 1px; height: 20px; background: var(--slate-200);"></div>
+            <div class="filter-group">
+                <span class="filter-label">Floor:</span>
+                <div class="filter-chip floor-chip active" onclick="applyFilters('all', 'floor', this)">All Floors</div>
+                <div class="filter-chip floor-chip" onclick="applyFilters('2', 'floor', this)">2nd</div>
+                <div class="filter-chip floor-chip" onclick="applyFilters('3', 'floor', this)">3rd</div>
+                <div class="filter-chip floor-chip" onclick="applyFilters('4', 'floor', this)">4th</div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="table-card">
+                <table class="room-table" id="roomTable">
+                    <thead>
+                        <tr>
+                            <th>Floor</th>
+                            <th>Room</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Temp</th>
+                            <th>Humidity</th>
+                            <th>Light</th>
+                            <th>AQI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="b-divider" data-building="ITS"><td colspan="8">ITS BUILDING</td></tr>
+                        <tr class="floor-divider" data-floor="2" data-building="ITS"><td colspan="8">2ND FLOOR</td></tr>
+                        <tr data-status="occupied" data-floor="2" data-building="ITS">
+                            <td>2nd Floor</td><td>200</td><td>Computer Lab</td>
+                            <td><span class="status-pill occupied">Occupied</span></td>
+                            <td class="sensor-alert">31.2°C</td><td>65%</td><td>420 lx</td><td>48</td>
+                        </tr>
+                        <tr data-status="vacant" data-floor="2" data-building="ITS">
+                            <td>2nd Floor</td><td>201</td><td>Computer Lab</td>
+                            <td><span class="status-pill vacant">Vacant</span></td>
+                            <td>24.1°C</td><td>50%</td><td>12 lx</td><td>12</td>
+                        </tr>
+
+                        <tr class="b-divider" data-building="PTC"><td colspan="8">PTC BUILDING</td></tr>
+                        <tr class="floor-divider" data-floor="2" data-building="PTC"><td colspan="8">2ND FLOOR</td></tr>
+                        <tr data-status="occupied" data-floor="2" data-building="PTC">
+                            <td>2nd Floor</td><td>201</td><td>Mac Lab</td>
+                            <td><span class="status-pill occupied">Occupied</span></td>
+                            <td>22.5°C</td><td>45%</td><td>310 lx</td><td class="sensor-alert">102</td>
+                        </tr>
+                        
+                        <tr class="floor-divider" data-floor="3" data-building="PTC"><td colspan="8">3RD FLOOR</td></tr>
+                        <tr data-status="vacant" data-floor="3" data-building="PTC"><td>3rd Floor</td><td>302</td><td>Lecture Room</td><td><span class="status-pill vacant">Vacant</span></td><td>23.8°C</td><td>55%</td><td>0 lx</td><td>15</td></tr>
+                        <tr data-status="occupied" data-floor="3" data-building="PTC"><td>3rd Floor</td><td>303</td><td>Computer Lab</td><td><span class="status-pill occupied">Occupied</span></td><td>24.2°C</td><td>58%</td><td>500 lx</td><td>32</td></tr>
+                        <tr data-status="vacant" data-floor="3" data-building="PTC"><td>3rd Floor</td><td>304</td><td>Computer Lab</td><td><span class="status-pill vacant">Vacant</span></td><td>22.1°C</td><td>40%</td><td>5 lx</td><td>10</td></tr>
+                        <tr data-status="vacant" data-floor="3" data-building="PTC"><td>3rd Floor</td><td>305</td><td>Computer Lab</td><td><span class="status-pill vacant">Vacant</span></td><td>23.5°C</td><td>42%</td><td>0 lx</td><td>18</td></tr>
+                        <tr data-status="occupied" data-floor="3" data-building="PTC"><td>3rd Floor</td><td>306</td><td>Computer Lab</td><td><span class="status-pill occupied">Occupied</span></td><td>26.1°C</td><td>60%</td><td>480 lx</td><td>40</td></tr>
+                        
+                        <tr class="floor-divider" data-floor="4" data-building="PTC"><td colspan="8">4TH FLOOR</td></tr>
+                        <tr data-status="vacant" data-floor="4" data-building="PTC"><td>4th Floor</td><td>403</td><td>Lecture Room</td><td><span class="status-pill vacant">Vacant</span></td><td>24.0°C</td><td>50%</td><td>0 lx</td><td>20</td></tr>
+                        <tr data-status="vacant" data-floor="4" data-building="PTC"><td>4th Floor</td><td>404</td><td>Lecture Room</td><td><span class="status-pill vacant">Vacant</span></td><td>23.9°C</td><td>51%</td><td>0 lx</td><td>22</td></tr>
+                        <tr data-status="vacant" data-floor="4" data-building="PTC"><td>4th Floor</td><td>405</td><td>Lecture Room</td><td><span class="status-pill vacant">Vacant</span></td><td>24.5°C</td><td>49%</td><td>0 lx</td><td>19</td></tr>
+                        <tr data-status="occupied" data-floor="4" data-building="PTC"><td>4th Floor</td><td>406</td><td>Lecture Room</td><td><span class="status-pill occupied">Occupied</span></td><td>25.2°C</td><td>55%</td><td>510 lx</td><td>35</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('time-display').innerText = now.toLocaleTimeString();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date-display').innerText = now.toLocaleDateString(undefined, options).toUpperCase();
+        }
+        setInterval(updateTime, 1000); updateTime();
+
+        let currentStatusFilter = 'all';
+        let currentFloorFilter = 'all';
+
+        function applyFilters(value, type, el) {
+            if (type === 'status') {
+                document.querySelectorAll('.status-chip').forEach(c => c.classList.remove('active'));
+                currentStatusFilter = value;
+            } else {
+                document.querySelectorAll('.floor-chip').forEach(c => c.classList.remove('active'));
+                currentFloorFilter = value;
+            }
+            el.classList.add('active');
+            filterTable();
+        }
+
+        function filterTable() {
+            const input = document.getElementById('roomSearch').value.toUpperCase();
+            const rows = document.querySelectorAll("#roomTable tbody tr");
+            const searchIncludesBuilding = (bName) => input.includes(bName);
+            const searchNumbers = input.match(/\d+/g) || [];
+
+            rows.forEach(row => {
+                if (row.classList.contains('b-divider') || row.classList.contains('floor-divider')) {
+                    row.style.display = ""; 
+                    return;
+                }
+
+                const bld = row.getAttribute('data-building');
+                const floor = row.getAttribute('data-floor');
+                const status = row.getAttribute('data-status');
+                const roomNum = row.cells[1].innerText;
+
+                const statusMatch = (currentStatusFilter === 'all' || status === currentStatusFilter);
+                const floorMatch = (currentFloorFilter === 'all' || floor === currentFloorFilter);
+
+                let searchMatch = false;
+                if (input === "") {
+                    searchMatch = true;
+                } else {
+                    const hasBuildingTerm = searchIncludesBuilding(bld);
+                    const hasRoomTerm = searchNumbers.some(num => roomNum.includes(num));
+                    
+                    if (input.includes(bld) && searchNumbers.length > 0) {
+                        searchMatch = hasBuildingTerm && hasRoomTerm;
+                    } else if (input.includes(bld)) {
+                        searchMatch = hasBuildingTerm;
+                    } else if (searchNumbers.length > 0) {
+                        searchMatch = hasRoomTerm;
+                    } else {
+                        searchMatch = row.innerText.toUpperCase().includes(input);
+                    }
+                }
+                row.style.display = (statusMatch && floorMatch && searchMatch) ? "" : "none";
+            });
+
+            const allRows = Array.from(rows);
+            allRows.forEach((row, index) => {
+                if (row.classList.contains('b-divider') || row.classList.contains('floor-divider')) {
+                    let hasVisibleItems = false;
+                    for (let i = index + 1; i < allRows.length; i++) {
+                        if (allRows[i].classList.contains('b-divider') || 
+                           (row.classList.contains('floor-divider') && allRows[i].classList.contains('floor-divider'))) break;
+                        if (allRows[i].style.display !== "none") {
+                            hasVisibleItems = true;
+                            break;
+                        }
+                    }
+                    row.style.display = hasVisibleItems ? "" : "none";
+                }
+            });
+        }
+        document.getElementById('roomSearch').addEventListener('keyup', filterTable);
+    </script>
+</body>
+</html>

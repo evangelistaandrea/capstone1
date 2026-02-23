@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHINMA UPang | IoT Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --school-green: #143628; 
+            --accent-green: #2d6a4f;
+            --sidebar-text: #e8f5e9;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-400: #94a3b8;
+            --slate-600: #64748b;
+            --slate-900: #0f172a;
+            --critical-red: #dc2626;
+            --warn-yellow: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* Sidebar */
+        .side-nav {
+            width: 270px; 
+            background: var(--school-green); 
+            display: flex; 
+            flex-direction: column; 
+            padding: 35px 20px; 
+            flex-shrink: 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+        .nav-logo { 
+            display: flex; flex-direction: column; align-items: center; gap: 15px; 
+            margin-bottom: 50px; text-align: center;
+        }
+        .logo-box { 
+            width: 80px; height: 80px; background: white; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+        .logo-box img { width: 100%; height: 100%; object-fit: cover; }
+        .nav-logo h2 { font-size: 1.1rem; font-weight: 800; color: white; letter-spacing: -0.5px; line-height: 1.2; }
+
+        .nav-item {
+            padding: 14px 16px; border-radius: 12px; color: var(--sidebar-text);
+            text-decoration: none; font-weight: 600; font-size: 0.85rem;
+            margin-bottom: 6px; cursor: pointer; display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s ease; opacity: 0.75;
+        }
+        .nav-item.active { background: var(--accent-green); color: white; opacity: 1; }
+        .nav-item:hover:not(.active) { background: rgba(255, 255, 255, 0.08); opacity: 1; }
+
+        .logout-btn {
+            margin-top: auto; padding: 14px; background: rgba(255, 255, 255, 0.05); 
+            color: white; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; 
+            font-weight: 800; cursor: pointer; font-size: 0.75rem;
+        }
+
+        /* Main content wrapper */
+        .main-wrapper { 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            min-width: 0; 
+            overflow: hidden; 
+        }
+
+        /* Top header */
+        .top-header {
+            background: white;
+            padding: 20px 35px;
+            border-bottom: 1px solid var(--slate-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .header-titles h1 {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--slate-900);
+        }
+
+        .header-titles p {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #1b4332;
+            text-transform: uppercase;
+        }
+
+        #time-display {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--slate-900);
+            display: block;
+            text-align: right;
+        }
+
+        #date-display {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--slate-600);
+            text-align: right;
+        }
+
+        /* Dashboard content */
+        .dashboard-content { 
+            padding: 30px; 
+            overflow-y: auto; 
+            flex-grow: 1; 
+        }
+        .iot-layout { background: white; border-radius: 16px; border: 1px solid var(--slate-200); overflow: hidden; display: flex; flex-direction: column; }
+        
+        .iot-tab-bar { display: flex; background: #f8fafc; border-bottom: 1px solid var(--slate-200); }
+        .iot-tab { 
+            padding: 15px 25px; border: none; background: none; cursor: pointer; 
+            font-weight: 700; font-size: 0.85rem; color: var(--slate-400); transition: 0.2s;
+        }
+        .iot-tab.active { color: var(--accent-green); border-bottom: 3px solid var(--accent-green); background: white; }
+
+        .iot-tab-panel { display: none; padding: 25px; }
+        .iot-tab-panel.active { display: block; }
+
+        .iot-panel-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .iot-panel-title { font-weight: 800; font-size: 1.1rem; color: var(--slate-900); }
+        .iot-panel-subtitle { font-size: 0.8rem; color: var(--slate-600); }
+        
+        .iot-search-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .iot-search-input, .iot-filter-select, .iot-modal-input, .iot-modal-select, .iot-modal-date { 
+            padding: 10px 15px; border: 1px solid var(--slate-200); border-radius: 8px; font-family: inherit; font-size: 0.85rem;
+        }
+        .iot-search-input { flex-grow: 1; }
+
+        .iot-primary-button { background: var(--accent-green); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .iot-secondary-button { background: white; color: var(--slate-600); border: 1px solid var(--slate-200); padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .iot-action-button { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--slate-200); background: white; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-right: 5px; }
+        .iot-action-danger { color: var(--critical-red); border-color: #fecaca; }
+
+        .room-table th { text-align: left; padding: 12px; background: #f8fafc; color: var(--slate-600); border-bottom: 1px solid var(--slate-200); }
+        .room-table td { padding: 12px; border-bottom: 1px solid var(--slate-100); vertical-align: middle; }
+
+        .iot-summary-badges { display: flex; gap: 15px; margin-bottom: 25px; }
+        .iot-summary-badge { padding: 8px 15px; background: var(--slate-100); border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: var(--slate-600); }
+
+        .iot-progress-container { display: flex; align-items: center; gap: 10px; }
+        .iot-progress-bar { flex-grow: 1; height: 8px; background: var(--slate-100); border-radius: 4px; overflow: hidden; max-width: 100px; }
+        .iot-progress-fill { height: 100%; transition: width 0.3s; }
+        .remaining-good { background: #22c55e; color: #166534; }
+        .remaining-warn { background: var(--warn-yellow); color: #92400e; }
+        .remaining-critical { background: var(--critical-red); color: #991b1b; }
+        .remaining-expired { background: #475569; color: white; }
+
+        .iot-status-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .iot-switch { width: 34px; height: 18px; background: #cbd5e1; border-radius: 10px; position: relative; transition: 0.3s; }
+        .iot-switch.active { background: #22c55e; }
+        .iot-switch-knob { width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.3s; }
+        .iot-switch.active .iot-switch-knob { left: 18px; }
+        .status-badge { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .status-good { color: #22c55e; }
+        .status-bad { color: var(--slate-400); }
+
+        .iot-modal-backdrop { 
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); 
+            display: none; align-items: center; justify-content: center; z-index: 1000; 
+        }
+        .iot-modal-backdrop.show { display: flex; }
+        .iot-modal { background: white; width: 450px; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+        .iot-modal-header { padding: 20px; border-bottom: 1px solid var(--slate-100); display: flex; justify-content: space-between; align-items: center; }
+        .iot-modal-title { font-weight: 800; }
+        .iot-modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--slate-400); }
+        .iot-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .iot-modal-label { font-size: 0.75rem; font-weight: 700; color: var(--slate-600); margin-bottom: 5px; }
+        .iot-modal-input, .iot-modal-select, .iot-modal-date { width: 100%; }
+        .iot-modal-footer { padding: 20px; background: #f8fafc; display: flex; justify-content: flex-end; gap: 10px; }
+    </style>
+</head>
+<body>
+    <nav class="side-nav">
+        <div class="nav-logo">
+            <div class="logo-box"><img src="logo.png" alt="Logo"></div>
+            <h2>PHINMA UPang<br>Admin Dashboard</h2>
+        </div>
+        <div class="nav-item" onclick="location.href='admin.html'">Dashboard</div>
+        <div class="nav-item" onclick="location.href='room-management.html'">Room Management</div>
+        <div class="nav-item" onclick="location.href='reports.html'">Reports</div>
+        <div class="nav-item active" onclick="location.href='iot-management.html'">IoT Management</div>
+        <button class="logout-btn" onclick="location.href='index.html'">LOGOUT SYSTEM</button>
+    </nav>
+
+    <main class="main-wrapper">
+        <header class="top-header">
+            <div class="header-titles">
+                <h1>IoT Management</h1>
+                <p>CITE SMART CLASSROOM MONITORING SYSTEM</p>
+            </div>
+            <div>
+                <span id="time-display">00:00:00 AM</span>
+                <span id="date-display">MONDAY, FEBRUARY 24, 2026</span>
+            </div>
+        </header>
+
+    <main class="main-wrapper">
+        <div class="content-area">
+
+            <div class="dashboard-content">
+                <div class="iot-layout">
+                    <div class="iot-tab-bar">
+                        <button id="tabClassrooms" class="iot-tab active" type="button">Classrooms</button>
+                        <button id="tabSensors" class="iot-tab" type="button">Sensors & Lifespan</button>
+                    </div>
+
+                    <div class="iot-tabs-container">
+                        <div id="panelClassrooms" class="iot-tab-panel active">
+                            <div class="iot-panel-header">
+                                <div>
+                                    <div class="iot-panel-title">Classrooms</div>
+                                    <div class="iot-panel-subtitle">Manage rooms for assigning sensors</div>
+                                </div>
+                                <div class="iot-panel-actions">
+                                    <span style="font-size:0.75rem; color:#64748b;"><span id="classroomCount">0</span> rooms</span>
+                                    <button id="openAddClassroomModal" class="iot-primary-button" type="button">+ Add Classroom</button>
+                                </div>
+                            </div>
+
+                            <div class="iot-search-row">
+                                <input id="classroomSearchInput" class="iot-search-input" type="text" placeholder="Search classrooms (e.g. PTC 101)">
+                            </div>
+
+                            <div class="iot-table-wrapper">
+                                <table class="room-table" style="width:100%; border-collapse: collapse; font-size: 0.85rem;">
+                                    <thead>
+                                        <tr>
+                                            <th>Room</th>
+                                            <th>Active Sensors</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="classroomTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="panelSensors" class="iot-tab-panel">
+                            <div class="iot-panel-header">
+                                <div>
+                                    <div class="iot-panel-title">Sensors & Lifespan</div>
+                                    <div class="iot-panel-subtitle">Track sensor health and maintenance needs</div>
+                                </div>
+                                <div class="iot-panel-actions">
+                                    <button id="openAddSensorModal" class="iot-primary-button" type="button">+ Add Sensor</button>
+                                </div>
+                            </div>
+
+                            <div class="iot-summary-badges">
+                                <div class="iot-summary-badge"><span id="summaryActiveCount">0</span> active</div>
+                                <div class="iot-summary-badge"><span id="summaryInactiveCount">0</span> inactive</div>
+                                <div class="iot-summary-badge"><span id="summaryEolCount">0</span> nearing end-of-life (&lt; 90 days)</div>
+                            </div>
+
+                            <div class="iot-search-row">
+                                <input id="sensorSearchInput" class="iot-search-input" type="text" placeholder="Search sensors">
+                                <select id="sensorStatusFilter" class="iot-filter-select">
+                                    <option value="all">All statuses</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                                <select id="sensorRoomFilter" class="iot-filter-select">
+                                    <option value="all">All rooms</option>
+                                </select>
+                            </div>
+
+                            <div class="iot-table-wrapper">
+                                <table class="room-table" style="width:100%; border-collapse: collapse; font-size: 0.8rem;">
+                                    <thead>
+                                        <tr>
+                                            <th>Sensor</th>
+                                            <th>Room</th>
+                                            <th>Status</th>
+                                            <th>Installed</th>
+                                            <th>Lifespan</th>
+                                            <th>Remaining</th>
+                                            <th>Health</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sensorTableBody"></tbody>
+                                </table>
+                            </div>
+
+                            <div class="iot-alerts-panel">
+                                <div>Alerts</div>
+                                <div id="criticalAlertsContainer" class="iot-alerts-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="addClassroomModal" class="iot-modal-backdrop">
+            <div class="iot-modal">
+                <div class="iot-modal-header">
+                    <div class="iot-modal-title">Add Classroom</div>
+                    <button type="button" class="iot-modal-close" data-close-modal="addClassroomModal">×</button>
+                </div>
+                <div class="iot-modal-body">
+                    <div>
+                        <div class="iot-modal-label">Room code</div>
+                        <input id="modalClassroomName" type="text" class="iot-modal-input" placeholder="e.g. PTC 101">
+                    </div>
+                    <div>
+                        <div class="iot-modal-label">Description (optional)</div>
+                        <input id="modalClassroomDescription" type="text" class="iot-modal-input" placeholder="e.g. Lecture Room 1">
+                    </div>
+                </div>
+                <div class="iot-modal-footer">
+                    <button type="button" class="iot-secondary-button" data-close-modal="addClassroomModal">Cancel</button>
+                    <button type="button" id="submitAddClassroom" class="iot-primary-button">Add Classroom</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="addSensorModal" class="iot-modal-backdrop">
+            <div class="iot-modal">
+                <div class="iot-modal-header">
+                    <div class="iot-modal-title">Add Sensor</div>
+                    <button type="button" class="iot-modal-close" data-close-modal="addSensorModal">×</button>
+                </div>
+                <div class="iot-modal-body">
+                    <div>
+                        <div class="iot-modal-label">Assign to room</div>
+                        <select id="modalSensorRoomSelect" class="iot-modal-select"></select>
+                    </div>
+                    <div>
+                        <div class="iot-modal-label">Sensor name</div>
+                        <input id="modalSensorName" type="text" class="iot-modal-input" placeholder="e.g. Temp Sensor 1">
+                    </div>
+                    <div>
+                        <div class="iot-modal-label">Installed date</div>
+                        <input id="modalSensorInstallDate" type="date" class="iot-modal-date">
+                    </div>
+                </div>
+                <div class="iot-modal-footer">
+                    <button type="button" class="iot-secondary-button" data-close-modal="addSensorModal">Cancel</button>
+                    <button type="button" id="submitAddSensor" class="iot-primary-button">Add Sensor</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+function updateTime() {
+            const now = new Date();
+            document.getElementById('time-display').innerText = now.toLocaleTimeString();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date-display').innerText = now.toLocaleDateString(undefined, options).toUpperCase();
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        const storageKeyClassrooms = 'iotClassrooms';
+        const storageKeySensors = 'iotSensors';
+        const DEFAULT_LIFESPAN_DAYS = 3 * 365;
+
+        function loadState() {
+            const storedRooms = localStorage.getItem(storageKeyClassrooms);
+            const storedSensors = localStorage.getItem(storageKeySensors);
+            let classrooms = storedRooms ? JSON.parse(storedRooms) : [];
+            let sensors = storedSensors ? JSON.parse(storedSensors) : [];
+            
+            if (!storedRooms || classrooms.length === 0) {
+                classrooms = [
+                    { id: 'PTC 101', name: 'PTC 101', description: '' },
+                    { id: 'PTC 201', name: 'PTC 201', description: '' },
+                    { id: 'PTC 306', name: 'PTC 306', description: '' }
+                ];
+            }
+            if (!storedSensors || sensors.length === 0) {
+                const today = new Date();
+                const iso = today.toISOString().split('T')[0];
+                sensors = [
+                    { id: 'S1', name: 'Temp Sensor 1', roomId: 'PTC 306', installDate: iso, status: 'active' },
+                    { id: 'S2', name: 'Air Quality Sensor 1', roomId: 'PTC 201', installDate: iso, status: 'active' }
+                ];
+            }
+            return { classrooms, sensors };
+        }
+
+        function saveState(classrooms, sensors) {
+            localStorage.setItem(storageKeyClassrooms, JSON.stringify(classrooms));
+            localStorage.setItem(storageKeySensors, JSON.stringify(sensors));
+        }
+
+        function daysBetween(start, end) {
+            const msPerDay = 1000 * 60 * 60 * 24;
+            const startUtc = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+            const endUtc = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
+            return Math.floor((endUtc - startUtc) / msPerDay);
+        }
+
+        function computeRemaining(sensor) {
+            const today = new Date();
+            const install = new Date(sensor.installDate);
+            const daysInUse = daysBetween(install, today);
+            const totalLifetimeDays = DEFAULT_LIFESPAN_DAYS;
+            const remainingDays = totalLifetimeDays - daysInUse;
+            const percentRemaining = totalLifetimeDays > 0 ? Math.max(0, Math.min(100, (remainingDays / totalLifetimeDays) * 100)) : 0;
+            return { remainingDays, totalLifetimeDays, percentRemaining };
+        }
+
+        function remainingClass(remainingDays) {
+            if (remainingDays < 0) return 'remaining-expired';
+            if (remainingDays < 30) return 'remaining-critical';
+            if (remainingDays < 180) return 'remaining-warn';
+            return 'remaining-good';
+        }
+
+        function healthLabel(remainingDays) {
+            if (remainingDays < 0) return 'Expired';
+            if (remainingDays < 90) return 'Near Expiry';
+            return 'Healthy';
+        }
+
+
+        function renderClassrooms(state, filters) {
+            const classroomTableBody = document.getElementById('classroomTableBody');
+            const classroomCount = document.getElementById('classroomCount');
+            const search = (filters.search || '').toLowerCase();
+
+            const filtered = state.classrooms.filter(room => {
+                if (!search) return true;
+                return room.name.toLowerCase().includes(search);
+            });
+
+            classroomTableBody.innerHTML = '';
+            filtered.forEach(room => {
+                const activeCount = state.sensors.filter(s => s.roomId === room.id && s.status === 'active').length;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${room.name}</td>
+                    <td>${activeCount}</td>
+                    <td>
+                        <button class="iot-action-button" data-classroom-action="rename" data-id="${room.id}">Rename</button>
+                        <button class="iot-action-button iot-action-danger" data-classroom-action="delete" data-id="${room.id}">Delete</button>
+                    </td>`;
+                classroomTableBody.appendChild(tr);
+            });
+            classroomCount.textContent = state.classrooms.length;
+        }
+
+        function renderSensors(state, filters) {
+            const sensorTableBody = document.getElementById('sensorTableBody');
+            const sensorRoomFilter = document.getElementById('sensorRoomFilter');
+            const summaryActive = document.getElementById('summaryActiveCount');
+            const summaryInactive = document.getElementById('summaryInactiveCount');
+            const summaryEol = document.getElementById('summaryEolCount');
+            const alertsContainer = document.getElementById('criticalAlertsContainer');
+
+            const currentRoomFilter = sensorRoomFilter.value;
+            sensorRoomFilter.innerHTML = '<option value="all">All rooms</option>';
+            state.classrooms.forEach(room => {
+                const opt = document.createElement('option');
+                opt.value = room.id;
+                opt.textContent = room.name;
+                sensorRoomFilter.appendChild(opt);
+            });
+            sensorRoomFilter.value = currentRoomFilter;
+
+            const search = (filters.search || '').toLowerCase();
+            const statusFilter = filters.status || 'all';
+            const roomFilter = filters.room || 'all';
+
+            let enriched = state.sensors.map(sensor => {
+                const info = computeRemaining(sensor);
+                return { sensor, ...info };
+            });
+
+            enriched = enriched.filter(entry => {
+                if (statusFilter !== 'all' && entry.sensor.status !== statusFilter) return false;
+                if (roomFilter !== 'all' && entry.sensor.roomId !== roomFilter) return false;
+                if (search && !entry.sensor.name.toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            let activeCount = 0, inactiveCount = 0, eolCount = 0;
+            let alerts = [];
+
+            sensorTableBody.innerHTML = '';
+            enriched.forEach(entry => {
+                const s = entry.sensor;
+                if (s.status === 'active') activeCount++; else inactiveCount++;
+                if (entry.remainingDays < 90 && entry.remainingDays >= 0) eolCount++;
+                if (entry.remainingDays < 30) alerts.push({ name: s.name, room: s.roomId, days: entry.remainingDays });
+
+                const tr = document.createElement('tr');
+                const remCls = remainingClass(entry.remainingDays);
+                const toggleCls = s.status === 'active' ? 'active' : '';
+
+                tr.innerHTML = `
+                    <td>${s.name}</td>
+                    <td>${s.roomId}</td>
+                    <td>
+                        <div class="iot-status-toggle" data-sensor-toggle="${s.id}">
+                            <div class="iot-switch ${toggleCls}"><div class="iot-switch-knob"></div></div>
+                            <span class="status-badge ${s.status === 'active' ? 'status-good' : 'status-bad'}">${s.status}</span>
+                        </div>
+                    </td>
+                    <td>${s.installDate}</td>
+                    <td>3 years</td>
+                    <td>
+                        <div class="iot-progress-container">
+                            <div class="iot-progress-bar"><div class="iot-progress-fill ${remCls}" style="width:${entry.percentRemaining}%"></div></div>
+                            <span class="remaining-label ${remCls}">${entry.remainingDays < 0 ? 'Expired' : entry.remainingDays + 'd'}</span>
+                        </div>
+                    </td>
+                    <td>${healthLabel(entry.remainingDays)}</td>
+                    <td>
+                        <button class="iot-action-button" data-sensor-action="rename" data-id="${s.id}">Rename</button>
+                        <button class="iot-action-button iot-action-danger" data-sensor-action="delete" data-id="${s.id}">Delete</button>
+                    </td>`;
+                sensorTableBody.appendChild(tr);
+            });
+
+            summaryActive.textContent = activeCount;
+            summaryInactive.textContent = inactiveCount;
+            summaryEol.textContent = eolCount;
+
+            alertsContainer.innerHTML = alerts.length ? '' : 'No critical sensor issues.';
+            alerts.forEach(a => {
+                const div = document.createElement('div');
+                div.className = 'iot-alert-item';
+                div.textContent = `${a.name} (${a.room}): ${a.days < 0 ? 'Expired' : a.days + ' days left'}`;
+                alertsContainer.appendChild(div);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let state = loadState();
+            const classroomFilters = { search: '' };
+            const sensorFilters = { search: '', status: 'all', room: 'all' };
+
+            document.getElementById('tabClassrooms').onclick = (e) => {
+                document.querySelectorAll('.iot-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.iot-tab-panel').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                document.getElementById('panelClassrooms').classList.add('active');
+            };
+
+            document.getElementById('tabSensors').onclick = (e) => {
+                document.querySelectorAll('.iot-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.iot-tab-panel').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                document.getElementById('panelSensors').classList.add('active');
+                renderSensors(state, sensorFilters);
+            };
+
+            const openMdl = (id) => document.getElementById(id).classList.add('show');
+            const closeMdl = (id) => document.getElementById(id).classList.remove('show');
+            document.querySelectorAll('[data-close-modal]').forEach(b => b.onclick = () => closeMdl(b.dataset.closeModal));
+
+            document.getElementById('openAddClassroomModal').onclick = () => openMdl('addClassroomModal');
+            document.getElementById('submitAddClassroom').onclick = () => {
+                const name = document.getElementById('modalClassroomName').value.trim();
+                if (name && !state.classrooms.find(r => r.id === name)) {
+                    state.classrooms.push({ id: name, name, description: '' });
+                    saveState(state.classrooms, state.sensors);
+                    renderClassrooms(state, classroomFilters);
+                    closeMdl('addClassroomModal');
+                }
+            };
+
+            document.getElementById('openAddSensorModal').onclick = () => {
+                const sel = document.getElementById('modalSensorRoomSelect');
+                sel.innerHTML = state.classrooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+                openMdl('addSensorModal');
+            };
+
+            document.getElementById('submitAddSensor').onclick = () => {
+                const name = document.getElementById('modalSensorName').value.trim();
+                const roomId = document.getElementById('modalSensorRoomSelect').value;
+                const date = document.getElementById('modalSensorInstallDate').value;
+                if (name && roomId && date) {
+                    state.sensors.push({ id: 'S' + Date.now(), name, roomId, installDate: date, status: 'active' });
+                    saveState(state.classrooms, state.sensors);
+                    renderSensors(state, sensorFilters);
+                    closeMdl('addSensorModal');
+                }
+            };
+
+            document.addEventListener('click', (e) => {
+                const target = e.target;
+                const sensorToggle = target.closest('[data-sensor-toggle]');
+                
+                if (sensorToggle) {
+                    const id = sensorToggle.dataset.sensorToggle;
+                    const s = state.sensors.find(x => x.id === id);
+                    s.status = s.status === 'active' ? 'inactive' : 'active';
+                    saveState(state.classrooms, state.sensors);
+                    renderSensors(state, sensorFilters);
+                }
+
+                if (target.dataset.sensorAction === 'delete') {
+                    if (confirm('Delete sensor?')) {
+                        state.sensors = state.sensors.filter(s => s.id !== target.dataset.id);
+                        saveState(state.classrooms, state.sensors);
+                        renderSensors(state, sensorFilters);
+                    }
+                }
+                
+                if (target.dataset.classroomAction === 'delete') {
+                    const hasSensors = state.sensors.some(s => s.roomId === target.dataset.id);
+                    if (hasSensors) return alert('Cannot delete room with active sensors.');
+                    state.classrooms = state.classrooms.filter(r => r.id !== target.dataset.id);
+                    saveState(state.classrooms, state.sensors);
+                    renderClassrooms(state, classroomFilters);
+                }
+            });
+            renderClassrooms(state, classroomFilters);
+            renderSensors(state, sensorFilters);
+        });
+    </script>
+</body>
+</html>

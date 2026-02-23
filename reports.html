@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports | PHINMA UPang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --school-green: #143628; 
+            --accent-green: #2d6a4f;
+            --sidebar-text: #e8f5e9;
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-400: #94a3b8;
+            --slate-600: #64748b;
+            --slate-900: #0f172a;
+            --critical-red: #dc2626;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--slate-50); height: 100vh; display: flex; overflow: hidden; }
+
+        .side-nav {
+            width: 270px; background: var(--school-green); 
+            display: flex; flex-direction: column; padding: 35px 20px; flex-shrink: 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+        .nav-logo { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 50px; text-align: center; }
+        .logo-box { width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid rgba(255,255,255,0.2); }
+        .logo-box img { width: 100%; height: 100%; object-fit: cover; }
+        .nav-logo h2 { font-size: 1.1rem; font-weight: 800; color: white; letter-spacing: -0.5px; line-height: 1.2; }
+
+        .nav-item {
+            padding: 14px 16px; border-radius: 12px; color: var(--sidebar-text);
+            text-decoration: none; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; 
+            cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s ease; opacity: 0.75;
+        }
+        .nav-item.active { background: var(--accent-green); color: white; opacity: 1; }
+        .nav-item:hover:not(.active) { background: rgba(255, 255, 255, 0.08); opacity: 1; }
+        
+        .logout-btn { margin-top: auto; padding: 14px; background: rgba(255, 255, 255, 0.05); color: white; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; }
+        .logout-btn:hover { background: var(--critical-red); border-color: transparent; }
+
+        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        .top-header { background: white; padding: 20px 35px; border-bottom: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .header-titles h1 { font-size: 1.4rem; font-weight: 900; color: var(--slate-900); }
+        .header-titles p { font-size: 0.75rem; font-weight: 700; color: #1b4332; text-transform: uppercase; }
+
+        #time-display { font-size: 1.2rem; font-weight: 900; color: var(--slate-900); display: block; text-align: right; }
+        #date-display { font-size: 0.7rem; font-weight: 600; color: var(--slate-600); text-align: right; }
+
+        .content-area { padding: 25px 35px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+
+        .filter-bar {
+            background: white; padding: 25px; border-radius: 18px; border: 1px solid var(--slate-200);
+            display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 140px; }
+        .filter-group label { font-size: 0.65rem; font-weight: 900; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-input {
+            padding: 12px 14px; border: 1px solid var(--slate-200); border-radius: 10px;
+            font-size: 0.85rem; font-weight: 600; color: var(--slate-900); background: var(--slate-50); outline: none;
+        }
+
+        .btn-primary { background: var(--school-green); color: white; padding: 14px 28px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 0.75rem; transition: 0.2s; }
+        .btn-primary:hover { background: var(--accent-green); }
+
+        .report-card { background: white; border-radius: 18px; border: 1px solid var(--slate-200); padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .reports-table-wrapper { flex-grow: 1; overflow-y: auto; margin-top: 20px; border-radius: 12px; border: 1px solid var(--slate-100); }
+        
+        .reports-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .reports-table th { position: sticky; top: 0; background: var(--slate-50); padding: 16px 20px; font-size: 0.7rem; font-weight: 800; color: var(--slate-400); text-transform: uppercase; border-bottom: 2px solid var(--slate-100); }
+        .reports-table td { padding: 16px 20px; font-size: 0.85rem; font-weight: 600; border-bottom: 1px solid var(--slate-100); color: var(--slate-900); }
+
+        .log-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+        .log-badge-change { background: #e0f2fe; color: #0369a1; }
+        .log-badge-addremove { background: #dcfce7; color: #166534; }
+        .log-badge-error { background: #fee2e2; color: #dc2626; }
+
+        .export-actions { display: flex; gap: 10px; }
+        .btn-secondary { background: var(--slate-100); color: var(--slate-600); border: 1px solid var(--slate-200); padding: 8px 16px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+        .btn-outline { background: transparent; color: var(--school-green); border: 1px solid var(--school-green); padding: 8px 16px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+
+        @media print {
+            .side-nav, .filter-bar, .export-actions, .top-header { display: none !important; }
+            .main-wrapper, .content-area, .report-card { height: auto; overflow: visible; padding: 0; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="side-nav">
+        <div class="nav-logo">
+            <div class="logo-box"><img src="logo.png" alt="Logo"></div>
+            <h2>PHINMA UPang<br>Admin Dashboard</h2>
+        </div>
+        <div class="nav-item" onclick="location.href='admin.html'">Dashboard</div>
+        <div class="nav-item" onclick="location.href='room-management.html'">Room Management</div>
+        <div class="nav-item active" onclick="location.href='reports.html'">Reports</div>
+        <div class="nav-item" onclick="location.href='iot-management.html'">IoT Management</div>
+        <button class="logout-btn" onclick="location.href='index.html'">LOGOUT SYSTEM</button>
+    </nav>
+
+    <main class="main-wrapper">
+        <header class="top-header">
+            <div class="header-titles">
+                <h1>System Reports</h1>
+                <p>CITE Smart Classroom Monitoring System</p>
+            </div>
+            <div>
+                <span id="time-display">00:00:00 AM</span>
+                <span id="date-display">MONDAY, FEBRUARY 23, 2026</span>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>Room</label>
+                    <select id="filterRoom" class="filter-input">
+                        <option value="all">All Rooms</option>
+                        <optgroup label="ITS BUILDING (2nd Floor)">
+                            <option value="ITS 200">ITS 200</option>
+                            <option value="ITS 201">ITS 201</option>
+                        </optgroup>
+                        <optgroup label="PTC BUILDING (2nd Floor)">
+                            <option value="PTC 201">PTC 201 (Mac Lab)</option>
+                        </optgroup>
+                        <optgroup label="PTC BUILDING (3rd Floor)">
+                            <option value="PTC 302">PTC 302</option>
+                            <option value="PTC 303">PTC 303</option>
+                            <option value="PTC 304">PTC 304</option>
+                            <option value="PTC 305">PTC 305</option>
+                            <option value="PTC 306">PTC 306</option>
+                        </optgroup>
+                        <optgroup label="PTC BUILDING (4th Floor)">
+                            <option value="PTC 403">PTC 403</option>
+                            <option value="PTC 404">PTC 404</option>
+                            <option value="PTC 405">PTC 405</option>
+                            <option value="PTC 406">PTC 406</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Date</label>
+                    <input id="filterDate" type="date" class="filter-input">
+                </div>
+
+                <div class="filter-group">
+    <label>Start Time</label>
+    <select id="filterTimeFrom" class="filter-input">
+        <optgroup label="Morning (AM)">
+            <option value="00:00">12:00 AM</option>
+            <option value="01:00">01:00 AM</option>
+            <option value="02:00">02:00 AM</option>
+            <option value="03:00">03:00 AM</option>
+            <option value="04:00">04:00 AM</option>
+            <option value="05:00">05:00 AM</option>
+            <option value="06:00">06:00 AM</option>
+            <option value="07:00">07:00 AM</option>
+            <option value="08:00">08:00 AM</option>
+            <option value="09:00">09:00 AM</option>
+            <option value="10:00">10:00 AM</option>
+            <option value="11:00">11:00 AM</option>
+        </optgroup>
+        <optgroup label="Afternoon/Evening (PM)">
+            <option value="12:00">12:00 PM</option>
+            <option value="13:00">01:00 PM</option>
+            <option value="14:00">02:00 PM</option>
+            <option value="15:00">03:00 PM</option>
+            <option value="16:00">04:00 PM</option>
+            <option value="17:00">05:00 PM</option>
+            <option value="18:00">06:00 PM</option>
+            <option value="19:00">07:00 PM</option>
+            <option value="20:00">08:00 PM</option>
+            <option value="21:00">09:00 PM</option>
+            <option value="22:00">10:00 PM</option>
+            <option value="23:00">11:00 PM</option>
+        </optgroup>
+    </select>
+</div>
+
+<div class="filter-group">
+    <label>End Time</label>
+    <select id="filterTimeTo" class="filter-input">
+        <optgroup label="Morning (AM)">
+            <option value="00:00">12:00 AM</option>
+            <option value="01:00">01:00 AM</option>
+            <option value="02:00">02:00 AM</option>
+            <option value="03:00">03:00 AM</option>
+            <option value="04:00">04:00 AM</option>
+            <option value="05:00">05:00 AM</option>
+            <option value="06:00">06:00 AM</option>
+            <option value="07:00">07:00 AM</option>
+            <option value="08:00">08:00 AM</option>
+            <option value="09:00">09:00 AM</option>
+            <option value="10:00">10:00 AM</option>
+            <option value="11:00">11:00 AM</option>
+        </optgroup>
+        <optgroup label="Afternoon/Evening (PM)">
+            <option value="12:00">12:00 PM</option>
+            <option value="13:00">01:00 PM</option>
+            <option value="14:00">02:00 PM</option>
+            <option value="15:00">03:00 PM</option>
+            <option value="16:00">04:00 PM</option>
+            <option value="17:00">05:00 PM</option>
+            <option value="18:00">06:00 PM</option>
+            <option value="19:00">07:00 PM</option>
+            <option value="20:00">08:00 PM</option>
+            <option value="21:00">09:00 PM</option>
+            <option value="22:00">10:00 PM</option>
+            <option value="23:59" selected>11:59 PM</option>
+        </optgroup>
+    </select>
+</div>
+
+                <button id="generateReportButton" class="btn-primary">GENERATE REPORT</button>
+            </div>
+
+            <div class="report-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 0.9rem; font-weight: 800; color: var(--slate-900);">Audit Trail</h3>
+                    <div class="export-actions">
+                        <button id="exportCsvButton" class="btn-secondary">EXPORT CSV</button>
+                        <button id="exportPdfButton" class="btn-outline">PRINT PDF</button>
+                    </div>
+                </div>
+
+                <div class="reports-table-wrapper">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Timestamp</th>
+                                <th style="width: 15%;">Type</th>
+                                <th style="width: 20%;">Location</th>
+                                <th style="width: 45%;">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 60px 0; color: var(--slate-400);">
+                                    Select options and click <b>Generate Report</b>.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('time-display').innerText = now.toLocaleTimeString();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date-display').innerText = now.toLocaleDateString(undefined, options).toUpperCase();
+        }
+        setInterval(updateTime, 1000); updateTime();
+
+        const activityLogs = [
+            { timestamp: '2026-02-23T08:15:00', type: 'Setting Change', category: 'change', room: 'ITS 200', details: 'Temp setpoint changed to 22°C.' },
+            { timestamp: '2026-02-23T14:45:00', type: 'Sensor Added', category: 'addremove', room: 'PTC 306', details: 'Added new motion sensor to Lab.' },
+            { timestamp: '2026-02-23T20:30:00', type: 'Error', category: 'error', room: 'PTC 201', details: 'Offline alert: Sensor battery low.' }
+        ];
+
+        document.getElementById('generateReportButton').addEventListener('click', () => {
+            const room = document.getElementById('filterRoom').value;
+            const startTime = document.getElementById('filterTimeFrom').value;
+            const endTime = document.getElementById('filterTimeTo').value;
+
+            const filtered = activityLogs.filter(log => {
+                const logTime = log.timestamp.split('T')[1].substring(0, 5);
+                const roomMatch = room === 'all' || log.room === room;
+                const timeMatch = logTime >= startTime && logTime <= endTime;
+                return roomMatch && timeMatch;
+            });
+
+            const tbody = document.getElementById('reportsTableBody');
+            tbody.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 60px 0; color: var(--slate-400);">No logs found for this period.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${new Date(log.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                    <td><span class="log-badge log-badge-${log.category}">${log.type}</span></td>
+                    <td>${log.room}</td>
+                    <td>${log.details}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+
+        document.getElementById('exportPdfButton').addEventListener('click', () => window.print());
+        document.getElementById('filterDate').valueAsDate = new Date();
+    </script>
+</body>
+</html>
